@@ -104,9 +104,8 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-transparent min-h-screen relative flex flex-col items-center py-6 md:py-12 px-4 md:px-8">
-
-  <div class="fixed inset-0 bg-gradient-to-br from-[#f0fdf4] via-[#ecfccb] to-[#d9f99d] -z-50"></div>
+<body class="bg-gradient-to-br from-[#f0fdf4] via-[#ecfccb] to-[#d9f99d] bg-fixed min-h-screen relative flex flex-col items-center py-8 md:py-12 px-4 md:px-8">
+ 
   <div class="floating-bg">
       <i class="fi fi-sr-book-alt float-icon" style="left: 10%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
       <i class="fi fi-sr-graduation-cap float-icon" style="left: 80%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
@@ -184,7 +183,7 @@
                       </div>
                   </div>
 
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-28 relative z-20">
                       <div>
                           <label class="block text-base font-bold mb-3 text-gray-700">ประเภทผู้เข้าร่วม <span class="text-rose-500">*</span></label>
                           <input type="hidden" id="userType" value="">
