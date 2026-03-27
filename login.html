@@ -8,53 +8,118 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent;}
-    .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 2rem; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15); }
-    .loader { width: 22px; height: 22px; border: 3px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
+    .main-container { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.6); }
+    .loader { width: 24px; height: 24px; border: 3px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
     @keyframes rotation { 100% { transform: rotate(360deg); } }
+
+    /* 🌟 ลายน้ำไอคอนลอยไปมา 🌟 */
+    .floating-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -40; }
+    .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(139, 195, 74, 0.15); animation: floatUp linear infinite; }
+    @keyframes floatUp {
+        0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; }
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-[#aedd50] via-[#8bc34a] to-[#689f38] min-h-screen p-4 flex flex-col items-center justify-center">
-  <div class="w-full max-w-md relative z-10 flex justify-center">
-      <div id="view-login" class="w-full animate-[fadeIn_0.5s_ease-out]">
-          <div class="glass-panel p-8 text-center">
-              <div class="w-20 h-20 bg-orange-50 rounded-full flex justify-center items-center text-orange-500 mx-auto mb-4 border border-orange-100"><i class="fi fi-sr-ticket text-4xl mt-1"></i></div>
-              <h2 class="text-3xl font-extrabold text-gray-800 mb-2">ดูคูปอง</h2>
-              <p class="text-gray-500 mb-8 text-sm">กรอกเบอร์โทรที่ใช้ลงทะเบียน</p>
-              <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
+<body class="bg-gradient-to-br from-[#f0fdf4] via-[#ecfccb] to-[#d9f99d] bg-fixed min-h-screen relative flex flex-col items-center justify-center py-8 px-4 md:px-8">
+  
+  <div class="floating-bg">
+      <i class="fi fi-sr-book-alt float-icon" style="left: 15%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
+      <i class="fi fi-sr-graduation-cap float-icon" style="left: 75%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
+      <i class="fi fi-sr-microscope float-icon" style="left: 25%; font-size: 3rem; animation-duration: 28s; animation-delay: 10s;"></i>
+      <i class="fi fi-sr-diploma float-icon" style="left: 65%; font-size: 4.5rem; animation-duration: 24s; animation-delay: 15s;"></i>
+      <i class="fi fi-sr-book-open-cover float-icon" style="left: 85%; font-size: 6rem; animation-duration: 30s; animation-delay: 2s;"></i>
+  </div>
+
+  <div class="w-full relative z-10 flex flex-col items-center justify-center">
+      
+      <div id="view-login" class="w-full max-w-xl animate-[fadeIn_0.5s_ease-out]">
+          <div class="main-container p-8 md:p-14 text-center relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-rose-500"></div>
+
+              <div class="w-24 h-24 bg-orange-50 rounded-[2rem] flex justify-center items-center text-orange-500 mx-auto mb-6 border-2 border-orange-100 shadow-sm transform rotate-3">
+                  <i class="fi fi-sr-ticket text-5xl mt-1"></i>
+              </div>
+              <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-3 tracking-tight">ดูคูปองของคุณ</h2>
+              <p class="text-gray-500 mb-10 text-sm md:text-base font-medium">กรอกเบอร์โทรศัพท์ที่ใช้ลงทะเบียนเพื่อค้นหา</p>
+              
+              <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5">
                   <div class="relative">
-                      <i class="fi fi-sr-phone-call absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                      <input type="tel" id="loginPhone" class="w-full pl-14 pr-4 py-4 rounded-2xl border bg-gray-50 focus:bg-white focus:border-orange-500 outline-none font-bold text-xl tracking-widest text-center" placeholder="08X-XXX-XXXX" required oninput="formatPhone(this)" maxlength="12">
+                      <i class="fi fi-sr-phone-call absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
+                      <input type="tel" id="loginPhone" class="w-full pl-16 pr-4 py-5 rounded-2xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-50 outline-none font-black text-2xl tracking-widest text-center transition-all text-gray-800" placeholder="08X-XXX-XXXX" required oninput="formatPhone(this)" maxlength="12">
                   </div>
-                  <button type="submit" id="btnLogin" class="w-full bg-orange-500 text-white p-4 rounded-2xl font-bold text-lg shadow-md hover:bg-orange-600 transition flex justify-center items-center gap-2"><i class="fi fi-sr-search"></i> ค้นหา</button>
+                  <button type="submit" id="btnLogin" class="w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white p-5 rounded-2xl font-black text-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex justify-center items-center gap-3">
+                      <i class="fi fi-sr-search mt-1"></i> ค้นหาคูปอง
+                  </button>
               </form>
-              <a href="index.html" class="mt-6 block text-sm text-gray-400 hover:text-orange-500 font-medium">กลับหน้าหลัก</a>
+              
+              <div class="mt-8 pt-8 border-t border-gray-100">
+                  <a href="index.html" class="inline-flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-orange-500 font-bold transition-colors">
+                      <i class="fi fi-sr-arrow-small-left text-lg"></i> กลับหน้าหลัก
+                  </a>
+              </div>
           </div>
       </div>
 
-      <div id="view-coupons" class="w-full hidden animate-[fadeIn_0.5s_ease-out]">
-          <div class="glass-panel p-6 flex flex-col relative min-h-[70vh]">
-              <a href="index.html" class="absolute top-4 right-4 bg-gray-100 w-10 h-10 rounded-full flex justify-center items-center text-gray-500 hover:bg-red-50 hover:text-red-500 transition"><i class="fi fi-sr-cross-small text-xl mt-1"></i></a>
-              <div class="mb-6 mt-4 text-center">
-                  <h2 class="text-xl font-bold text-gray-800" id="userNameType"></h2>
-                  <p class="text-green-600 font-bold flex items-center justify-center gap-2 text-sm"><i class="fi fi-sr-phone-call"></i> <span id="userPhoneDisplay"></span></p>
+      <div id="view-coupons" class="w-full max-w-5xl hidden animate-[fadeIn_0.5s_ease-out]">
+          <div class="main-container p-6 md:p-12 flex flex-col relative min-h-[75vh] shadow-2xl border-2 border-white">
+              
+              <a href="index.html" class="absolute top-6 right-6 bg-gray-100 w-12 h-12 rounded-full flex justify-center items-center text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors shadow-sm">
+                  <i class="fi fi-sr-cross-small text-2xl mt-1"></i>
+              </a>
+              
+              <div class="mb-10 md:mb-14 mt-4 md:mt-8 text-center flex flex-col items-center">
+                  <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-4 border border-green-100">
+                      <i class="fi fi-sr-user text-2xl mt-1"></i>
+                  </div>
+                  <h2 class="text-2xl md:text-3xl font-black text-gray-800" id="userNameType"></h2>
+                  <div class="bg-gray-100 px-4 py-2 rounded-full mt-3 flex items-center gap-2">
+                      <i class="fi fi-sr-phone-call text-gray-500 text-sm"></i>
+                      <span id="userPhoneDisplay" class="text-gray-700 font-bold tracking-widest"></span>
+                  </div>
               </div>
-              <div class="text-center mb-4"><h3 class="font-bold text-gray-800">คูปองของคุณ</h3><p class="text-[10px] text-gray-500">แตะที่คูปองเพื่อแสดง QR Code</p></div>
-              <div id="couponList" class="flex flex-col items-center space-y-4 pb-4 overflow-y-auto"></div>
+              
+              <div class="mb-6 flex justify-between items-end border-b-2 border-gray-50 pb-4">
+                  <div>
+                      <h3 class="font-black text-2xl text-gray-800 flex items-center gap-2">
+                          <i class="fi fi-sr-ticket text-orange-500"></i> คูปองของคุณ
+                      </h3>
+                      <p class="text-sm text-gray-500 font-medium mt-1">แตะที่คูปองเพื่อแสดง QR Code ยื่นให้เจ้าหน้าที่</p>
+                  </div>
+              </div>
+              
+              <div id="couponList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+                  </div>
+              
           </div>
       </div>
   </div>
 
   <script>
     // ==========================================
-    // ใส่ URL ของ Google Apps Script ของคุณที่นี่
+    // ⚠️ ใส่ URL ของ Google Apps Script ตัวใหม่ ⚠️
     // ==========================================
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz2WVLumggLAGfibD_9u-Ms3hiTKz0gaEtx9EDSKm_yXtgqmuBZ8NlefiJHp7C0ejTY/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz2WVLumggLAGfibD_9u-Ms3hiTKz0gaEtx9EDSKm_yXtgqmuBZ8NlefiJHp7C0ejTY/exec'; 
+
+    let pollInterval;
 
     async function apiCall(action, data = {}) {
         try {
-            const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, data: data }) });
+            const res = await fetch(GAS_URL, { 
+                method: 'POST', 
+                redirect: 'follow',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: action, data: data }) 
+            });
             return await res.json();
         } catch(e) { throw new Error('Network Error'); }
     }
@@ -64,81 +129,86 @@
         inp.value = v.length > 6 ? `${v.substring(0,3)}-${v.substring(3,6)}-${v.substring(6)}` : v.length > 3 ? `${v.substring(0,3)}-${v.substring(3)}` : v;
     }
 
-    let pollInterval; // ตัวแปรเก็บเวลาการเช็ค
-
     function showQR(codeStr, dateStr, isDay1, isUsed) {
         if(isUsed) {
-            Swal.fire({icon: 'info', title: 'ใช้งานไปแล้ว', text: 'คูปองรหัสนี้ถูกสแกนใช้งานไปเรียบร้อยแล้วครับ', confirmButtonColor: '#9ca3af', customClass: { popup: 'rounded-3xl' }});
+            Swal.fire({icon: 'info', title: 'คูปองถูกใช้แล้ว', text: 'คูปองรหัสนี้ถูกสแกนใช้งานไปเรียบร้อยแล้วครับ', confirmButtonColor: '#9ca3af', customClass: { popup: 'rounded-[2rem]' }});
             return;
         }
 
         let color = isDay1 ? "#f57c00" : "#2e7d32";
         Swal.fire({
-            title: 'ยื่นให้สตาฟฟ์',
-            html: `<p class="text-xs text-gray-500 mb-3">${dateStr}</p><div id="popupQrWrap" class="bg-white p-3 rounded-2xl border inline-block mb-3 shadow-sm transition-all duration-500"><img id="popupQrImg" src="https://quickchart.io/qr?text=${encodeURIComponent(codeStr)}&size=200" class="w-48 h-48"></div><div id="popupCodeTxt" class="font-mono text-2xl font-bold py-2 rounded-lg transition-all duration-500" style="color:${color}; background:${color}15;">${codeStr}</div>`,
-            confirmButtonText: 'ปิด', confirmButtonColor: color, customClass: { popup: 'rounded-3xl' },
+            title: 'ยื่นให้เจ้าหน้าที่',
+            html: `
+                <p class="text-sm font-bold text-gray-500 mb-4">${dateStr}</p>
+                <div id="popupQrWrap" class="bg-white p-4 rounded-3xl border-2 border-dashed border-gray-200 inline-block mb-4 shadow-sm transition-all duration-500">
+                    <img id="popupQrImg" src="https://quickchart.io/qr?text=${encodeURIComponent(codeStr)}&size=250" class="w-56 h-56 mx-auto">
+                </div>
+                <div id="popupCodeTxt" class="font-mono text-3xl font-black py-4 rounded-2xl transition-all duration-500 tracking-widest shadow-inner" style="color:${color}; background:${color}15;">${codeStr}</div>
+            `,
+            confirmButtonText: 'ปิดหน้าต่าง', confirmButtonColor: color, customClass: { popup: 'rounded-[2.5rem] p-8' },
             didOpen: () => {
-                // เริ่มเช็คสถานะตอนเปิด QR
                 pollInterval = setInterval(() => {
                     apiCall('checkCouponStatus', { code: codeStr }).then(res => {
                         if(res.used) {
                             clearInterval(pollInterval);
-                            document.getElementById('popupQrImg').classList.add('grayscale', 'opacity-30');
-                            document.getElementById('popupQrWrap').classList.add('bg-gray-100');
+                            document.getElementById('popupQrImg').classList.add('grayscale', 'opacity-20');
+                            document.getElementById('popupQrWrap').classList.add('bg-gray-50', 'border-gray-300');
                             document.getElementById('popupCodeTxt').innerText = "ใช้งานแล้ว";
                             document.getElementById('popupCodeTxt').style = "color:#9ca3af; background:#f3f4f6;";
-                            Swal.fire({icon:'success', title:'สแกนเสร็จสิ้น!', text:'ขอบคุณที่มาร่วมสนุกกันนะครับ!', confirmButtonColor: '#f57c00', customClass: { popup: 'rounded-3xl' }});
-                            // โหลดหน้าใหม่เพื่ออัปเดตลิสต์คูปองเป็นสีเทา
+                            Swal.fire({icon:'success', title:'สแกนเสร็จสิ้น!', text:'ขอบคุณที่มาร่วมสนุกกันที่บูธนะครับ!', confirmButtonColor: '#f57c00', customClass: { popup: 'rounded-[2rem]' }});
                             setTimeout(() => handleLogin(document.getElementById('loginPhone').value), 2000);
                         }
                     });
                 }, 3000);
             },
-            willClose: () => { clearInterval(pollInterval); } // หยุดเช็คตอนกดปิด
+            willClose: () => { clearInterval(pollInterval); }
         });
     }
 
     function handleLogin(autoPhone = null) {
         let btn = document.getElementById('btnLogin');
         let phone = autoPhone || document.getElementById('loginPhone').value;
-        if(phone.length !== 12) return Swal.fire({icon: 'warning', text: 'เบอร์ไม่ครบ 10 หลัก'});
+        if(phone.length !== 12) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ถูกต้อง', text: 'กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก'});
         
-        if(!autoPhone) { btn.innerHTML = '<span class="loader mr-2"></span> รอสักครู่...'; btn.disabled = true; }
+        if(!autoPhone) { btn.innerHTML = '<span class="loader mr-3 border-white border-r-transparent"></span> รอสักครู่...'; btn.disabled = true; }
 
         apiCall('doLogin', { phone: phone }).then(res => {
-            btn.innerHTML = '<i class="fi fi-sr-search"></i> ค้นหา'; btn.disabled = false;
+            btn.innerHTML = '<i class="fi fi-sr-search mt-1"></i> ค้นหาคูปอง'; btn.disabled = false;
             if(res.status === 'success') {
-                document.getElementById('userNameType').innerText = "สถานะ: " + res.userData.type;
+                document.getElementById('userNameType').innerText = res.userData.type;
                 document.getElementById('userPhoneDisplay').innerText = res.userData.phone;
                 
                 document.getElementById('couponList').innerHTML = res.userData.coupons.map(c => {
                     let isD1 = c.date.includes('25') || c.code.includes('D1');
                     let isUsed = c.status === "ใช้งานแล้ว";
                     
-                    // กำหนดสี: ถ้าใช้แล้วให้เป็นสีเทาหม่นๆ
-                    let bg = isUsed ? "bg-gray-100 border-gray-200 opacity-60" : (isD1 ? "bg-orange-50 border-orange-200" : "bg-green-50 border-green-200");
+                    let bg = isUsed ? "bg-gray-50 border-gray-200 opacity-70" : (isD1 ? "bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200" : "bg-gradient-to-br from-green-50 to-green-100/50 border-green-200");
                     let txt = isUsed ? "text-gray-400" : (isD1 ? "text-orange-500" : "text-green-600");
-                    let badge = isUsed ? `<span class="absolute top-2 right-2 bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded font-bold">ใช้แล้ว</span>` : '';
+                    let badge = isUsed ? `<span class="absolute top-4 right-4 bg-gray-500 text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-sm">สแกนแล้ว</span>` : '';
 
-                    return `<div onclick="showQR('${c.code}', '${c.date}', ${isD1}, ${isUsed})" class="relative w-full max-w-[280px] p-4 rounded-2xl border-2 ${bg} cursor-pointer active:scale-95 transition flex justify-between items-center shadow-sm">
+                    // นำ max-w-[280px] ออก และใช้ w-full ให้มันขยายเต็มตาราง Grid
+                    return `
+                    <div onclick="showQR('${c.code}', '${c.date}', ${isD1}, ${isUsed})" class="relative w-full p-6 md:p-8 rounded-3xl border-2 ${bg} cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all flex justify-between items-center group">
                         ${badge}
-                        <div class="flex items-center gap-3">
-                            <i class="fi fi-sr-ticket text-3xl ${txt} opacity-80"></i>
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-full bg-white flex justify-center items-center shadow-sm group-hover:scale-110 transition-transform">
+                                <i class="fi fi-sr-ticket text-3xl ${txt} mt-1"></i>
+                            </div>
                             <div class="text-left">
-                                <p class="font-bold text-gray-800 leading-tight">คูปองถ่ายรูป ${isUsed ? '(หมดอายุ)' : ''}</p>
-                                <p class="text-[10px] text-gray-500">${isD1 ? 'วันที่ 1' : 'วันที่ 2'}</p>
+                                <p class="font-black text-gray-800 text-lg leading-tight">คูปองถ่ายรูป</p>
+                                <p class="text-sm font-bold ${txt} opacity-80 mt-1">${isD1 ? 'DAY 1' : 'DAY 2'}</p>
                             </div>
                         </div>
-                        <i class="fi fi-sr-qr-scan text-xl text-gray-400"></i>
+                        <i class="fi fi-sr-qr-scan text-3xl text-gray-300 group-hover:text-gray-400 transition-colors ${isUsed ? 'hidden' : ''}"></i>
                     </div>`;
                 }).join('');
                 
                 document.getElementById('view-login').classList.add('hidden');
                 document.getElementById('view-coupons').classList.remove('hidden');
-            } else Swal.fire({icon: 'error', text: res.message});
+            } else Swal.fire({icon: 'error', title: 'ไม่พบข้อมูล', text: res.message});
         }).catch(() => {
-            btn.innerHTML = '<i class="fi fi-sr-search"></i> ค้นหา'; btn.disabled = false;
-            Swal.fire({icon: 'error', text: 'ขัดข้อง'});
+            btn.innerHTML = '<i class="fi fi-sr-search mt-1"></i> ค้นหาคูปอง'; btn.disabled = false;
+            Swal.fire({icon: 'error', title: 'ขัดข้อง', text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้'});
         });
     }
   </script>
