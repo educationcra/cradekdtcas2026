@@ -301,6 +301,7 @@
     }
 
     function processCode(code) {
+        // 1. แจ้งเตือนสแกนกำลังตรวจสอบ (มีวงกลมหมุนๆ)
         Swal.fire({ 
             title: 'กำลังตรวจสอบ...', 
             html: `<div class="mt-4 py-3 bg-gray-50 rounded-xl border"><b class="text-3xl tracking-widest text-orange-500 font-mono">${code}</b></div>`, 
@@ -309,20 +310,43 @@
             customClass: { popup: 'rounded-3xl' }
         });
 
-        apiCall('processCouponScan', { code: code, suffix: currentSuffix }).then(res => {
+        apiCall('processCouponScan', { code: code, suffix: currentSuffix }).then(async res => {
+            // 2. หน่วงเวลา 2 วินาทีตามที่ขอ
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
             if(res.status === 'success') {
-                Swal.fire({ icon: 'success', title: 'ใช้งานคูปองสำเร็จ!', text: `รหัส: ${code}`, timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+                // 3. โชว์ผลสำเร็จ และบังคับให้กด "ปิดหน้าต่าง"
+                await Swal.fire({ 
+                    icon: 'success', 
+                    title: 'ใช้งานคูปองสำเร็จ!', 
+                    text: `รหัส: ${code}`, 
+                    showConfirmButton: true,
+                    confirmButtonText: 'ปิดหน้าต่าง (สแกนคิวต่อไป)',
+                    confirmButtonColor: '#22c55e',
+                    allowOutsideClick: false,
+                    customClass: { popup: 'rounded-3xl' } 
+                });
                 if(res.stats) updateStatsUI(res.stats);
             } else {
-                Swal.fire({ icon: 'error', title: 'ไม่ผ่าน', text: res.message, confirmButtonColor: '#f43f5e', customClass: { popup: 'rounded-3xl' } });
+                await Swal.fire({ 
+                    icon: 'error', 
+                    title: 'ไม่ผ่าน', 
+                    text: res.message, 
+                    confirmButtonColor: '#f43f5e', 
+                    showConfirmButton: true,
+                    confirmButtonText: 'ปิดหน้าต่าง',
+                    allowOutsideClick: false,
+                    customClass: { popup: 'rounded-3xl' } 
+                });
             }
             
-            // กลับมาสแกนต่อหลังจากประมวลผลเสร็จ
+            // 4. สแกนเนอร์จะทำงานต่อก็ต่อเมื่อกดปิด Popup แล้วเท่านั้น
             if(html5QrCode && html5QrCode.getState() === 3) html5QrCode.resume();
             document.getElementById('manualCode').value = "";
             document.getElementById('manualCode').focus();
-        }).catch(() => {
-            Swal.fire({ icon: 'error', title: 'ขัดข้อง', text: 'ยิง API ไม่สำเร็จ', customClass: { popup: 'rounded-3xl' } });
+        }).catch(async () => {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await Swal.fire({ icon: 'error', title: 'ขัดข้อง', text: 'ยิง API ไม่สำเร็จ', showConfirmButton: true, customClass: { popup: 'rounded-3xl' } });
             if(html5QrCode && html5QrCode.getState() === 3) html5QrCode.resume();
         });
     }
