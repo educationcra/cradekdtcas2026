@@ -314,7 +314,19 @@
                       </h3>
                       <div class="space-y-4" id="ratingContainer"></div>
                   </div>
-                  
+
+                  <div class="pt-8 border-t border-gray-200 mt-6">
+    <label class="block text-base font-bold mb-4 text-gray-800">หลักสูตรใหม่ที่ต้องการให้ราชวิทยาลัยจุฬาภรณ์เปิดรับ <span class="text-rose-500">*</span></label>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="normal-radio bg-white"><input type="radio" name="newCourse" value="เภสัชศาสตร์" onchange="updateRadioStyle(this); checkOther(this, 'otherNewCourse')"><span class="n-checkmark"></span><span class="text-gray-700">เภสัชศาสตร์</span></label>
+        <label class="normal-radio bg-white"><input type="radio" name="newCourse" value="ทันตแพทยศาสตร์" onchange="updateRadioStyle(this); checkOther(this, 'otherNewCourse')"><span class="n-checkmark"></span><span class="text-gray-700">ทันตแพทยศาสตร์</span></label>
+        <label class="normal-radio bg-white"><input type="radio" name="newCourse" value="สัตวแพทยศาสตร์" onchange="updateRadioStyle(this); checkOther(this, 'otherNewCourse')"><span class="n-checkmark"></span><span class="text-gray-700">สัตวแพทยศาสตร์</span></label>
+        <label class="normal-radio bg-white"><input type="radio" name="newCourse" value="เทคนิคการแพทย์" onchange="updateRadioStyle(this); checkOther(this, 'otherNewCourse')"><span class="n-checkmark"></span><span class="text-gray-700">เทคนิคการแพทย์</span></label>
+        <label class="normal-radio bg-white md:col-span-2"><input type="radio" name="newCourse" value="อื่นๆ" onchange="updateRadioStyle(this); checkOther(this, 'otherNewCourse')"><span class="n-checkmark"></span><span class="text-gray-700">อื่นๆ (โปรดระบุ)</span></label>
+    </div>
+    <input type="text" id="otherNewCourse" class="input-glass mt-4 hidden border-orange-300 bg-orange-50 focus:border-orange-500" placeholder="โปรดระบุหลักสูตรที่ต้องการ...">
+</div>
+                
                   <div class="pt-6">
                       <label class="block text-base font-bold mb-2 text-gray-700">ข้อเสนอแนะเพิ่มเติม <span class="text-rose-500">*</span></label>
                       <p class="text-sm text-gray-500 font-medium mb-4 leading-relaxed">บอกเราหน่อยว่า "อยากให้ทีมงานจัดกิจกรรมแบบไหนเพิ่มเติม หรือมีอะไรอยากจะบอกหรือให้กำลังใจทีมงาน"</p>
@@ -714,7 +726,8 @@
             followPage: document.querySelector('input[name="followPage"]:checked').value,
             followPlatform: document.getElementById('followPlatform').value || "-",
             prSatisfactionScore: document.querySelector('input[name="prSatisfactionScore"]:checked').value,
-            mediaSatisfactionScore: document.querySelector('input[name="mediaSatisfactionScore"]:checked').value
+          mediaSatisfactionScore: document.querySelector('input[name="mediaSatisfactionScore"]:checked').value,
+            newCourse: document.querySelector('input[name="newCourse"]:checked').value === "อื่นๆ" ? document.getElementById('otherNewCourse').value : document.querySelector('input[name="newCourse"]:checked').value
         };
         Object.keys(payload).forEach(k => payload[k] = payload[k] || "-");
 
