@@ -118,9 +118,17 @@
         let btn = document.getElementById('btnLogin'); btn.innerText = 'รอสักครู่...'; btn.disabled = true;
         apiCall('verifyAdminPin', { pin: fullPin }).then(res => {
             btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
-            if(res.status === 'success') { sessionStorage.setItem('adminAuth', 'true'); showScannerUI(); } 
-            else Swal.fire({icon: 'error', text: res.message});
-        }).catch(() => { btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false; });
+            if(res.status === 'success') { 
+                sessionStorage.setItem('adminAuth', 'true'); 
+                showScannerUI(); 
+            } else {
+                Swal.fire({icon: 'error', text: res.message});
+            }
+        }).catch((err) => { 
+            btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
+            // เพิ่มบรรทัดนี้ เพื่อให้เรารู้ว่ามันพังเพราะอะไร
+            Swal.fire({icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: err.message});
+        });
     }
 
     function showScannerUI() {
