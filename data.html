@@ -96,12 +96,18 @@
 
     <div class="glass-card p-8 mb-8">
       <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-3">
-        <i class="fi fi-sr-graduation-cap text-cra-secondary text-2xl"></i> จัดอันดับความสนใจหลักสูตร (อันดับ 1)
+        <i class="fi fi-sr-graduation-cap text-cra-secondary text-2xl"></i> จัดอันดับความสนใจหลักสูตร (รวมทั้ง 3 อันดับ)
       </h3>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left border-collapse">
           <thead class="bg-green-50 text-green-700 font-bold uppercase rounded-t-xl">
-              <tr><th class="p-4 w-16 text-center">อันดับ</th><th class="p-4">หลักสูตร</th><th class="p-4 text-right">จำนวน</th><th class="p-4 text-right">ร้อยละ</th><th class="p-4 w-1/4 no-print">ความนิยม</th></tr>
+              <tr>
+                  <th class="p-4 w-20 text-center">อันดับ</th>
+                  <th class="p-4">หลักสูตร</th>
+                  <th class="p-4 text-right">จำนวน (Mentions)</th>
+                  <th class="p-4 text-right">ร้อยละของผู้เข้าร่วม</th>
+                  <th class="p-4 w-1/4 no-print">ความนิยม</th>
+              </tr>
           </thead>
           <tbody id="currTableBody" class="divide-y divide-gray-100"></tbody>
         </table>
@@ -228,7 +234,9 @@
 
       renderSatisfaction(data);
       renderPieSections(data, total);
-      renderRankingTable('currTableBody', getCounts(data, 12), total, true); // หลักสูตรอันดับ 1 (Col 12)
+      
+      // 🌟 เรียกใช้ฟังก์ชันนับรวม 3 อันดับ 🌟
+      renderRankingTable('currTableBody', getCombinedCourseCounts(data), total, true); 
 
       const dynGrid = document.getElementById('dynamicGrid'); dynGrid.innerHTML = '';
       const configs = [
@@ -244,6 +252,22 @@
 
       renderSplitTables(data, total);
       renderPrintData(data);
+    }
+
+    // 🌟 ฟังก์ชันนับรวบยอดความสนใจอันดับ 1, 2, 3 🌟
+    function getCombinedCourseCounts(data) {
+        let c = {};
+        data.forEach(r => {
+            // คอลัมน์ 12, 13, 14 ใน GS คือ อันดับ 1, 2, 3 ตามลำดับ
+            [12, 13, 14].forEach(idx => {
+                let val = String(r[idx]).trim();
+                if (val && val !== "-" && val !== "") {
+                    c[val] = (c[val] || 0) + 1;
+                }
+            });
+        });
+        // เรียงจากมากไปน้อย
+        return Object.entries(c).sort((a,b) => b[1] - a[1]);
     }
 
     function renderSatisfaction(data) {
@@ -265,11 +289,24 @@
     }
 
     function renderRankingTable(containerId, data, total, showBar = false) {
-      const medals = ['<i class="fi fi-sr-medal text-2xl text-yellow-400"></i>', '<i class="fi fi-sr-medal text-2xl text-gray-400"></i>', '<i class="fi fi-sr-medal text-2xl text-orange-400"></i>'];
+      const medals = [
+          '<div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mx-auto shadow-sm border border-yellow-200"><i class="fi fi-sr-medal text-xl text-yellow-500 mt-1"></i></div>', 
+          '<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mx-auto shadow-sm border border-gray-200"><i class="fi fi-sr-medal text-xl text-gray-400 mt-1"></i></div>', 
+          '<div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mx-auto shadow-sm border border-orange-200"><i class="fi fi-sr-medal text-xl text-orange-500 mt-1"></i></div>'
+      ];
+      
       document.getElementById(containerId).innerHTML = data.map((it, i) => {
-        let p = preciseRound(it[1]*100/total, 1).toFixed(1), icon = i < 3 ? medals[i] : `<span class="font-bold text-gray-400">${i+1}</span>`;
-        let rs = i===0 ? "bg-orange-50/50" : "";
-        return `<tr class="${rs} hover:bg-gray-50 transition-colors"> <td class="p-4 text-center align-middle">${icon}</td> <td class="p-4 font-bold text-gray-700">${it[0]}</td> <td class="p-4 text-right font-black text-cra-primary text-lg">${it[1]}</td> <td class="p-4 text-right text-gray-500 font-bold">${p}%</td> ${showBar ? `<td class="p-4 no-print"><div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div class="bg-cra-secondary h-2 rounded-full" style="width:${p}%"></div></div></td>` : ''}</tr>`;
+        let p = preciseRound(it[1]*100/total, 1).toFixed(1);
+        let icon = i < 3 ? medals[i] : `<span class="font-black text-gray-400 text-lg">${i+1}</span>`;
+        let rs = i===0 ? "bg-orange-50/60" : (i===1 ? "bg-gray-50/60" : (i===2 ? "bg-amber-50/30" : ""));
+        
+        return `<tr class="${rs} hover:bg-green-50 transition-colors"> 
+            <td class="p-3 text-center align-middle">${icon}</td> 
+            <td class="p-3 font-bold text-gray-700">${it[0]}</td> 
+            <td class="p-3 text-right font-black text-cra-primary text-lg">${it[1]}</td> 
+            <td class="p-3 text-right text-gray-500 font-bold">${p}%</td> 
+            ${showBar ? `<td class="p-3 no-print"><div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden"><div class="bg-cra-secondary h-2 rounded-full" style="width:${p}%"></div></div></td>` : ''}
+        </tr>`;
       }).join('');
     }
 
