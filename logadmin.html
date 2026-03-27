@@ -1,283 +1,352 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Control Panel</title>
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>STAFF DASHBOARD - CRA TCAS Fair</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   
   <style>
-    body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
-    .glass-card { background: white; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+    body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f0fdf4; -webkit-tap-highlight-color: transparent;}
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #f8fafc; }
     
-    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    /* PIN Inputs */
+    .pin-box { text-align: center; font-size: 1.75rem; font-weight: 800; border: 2px solid #cbd5e1; border-radius: 0.75rem; transition: all 0.2s ease; outline: none; background: #f8fafc; color: #f57c00; }
+    .pin-box:focus { border-color: #f57c00; background: white; box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.1); transform: translateY(-2px); }
     
-    .scanner-wrapper { position: relative; width: 100%; height: 320px; background: black; border-radius: 1.25rem; overflow: hidden; border: 4px solid #fff; }
+    /* Toggle Switch */
+    .toggle-checkbox:checked { right: 0; border-color: #f43f5e; }
+    .toggle-checkbox:checked + .toggle-label { background-color: #f43f5e; }
+    
+    /* Scanner UI */
+    .scanner-wrapper { position: relative; width: 100%; height: 350px; background: #0f172a; border-radius: 1.5rem; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
     #reader { width: 100%; height: 100%; }
-    #reader video { object-fit: cover !important; }
-    
-    .scan-overlay { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-    .scan-box { width: 220px; height: 220px; position: relative; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); border: 2px solid rgba(255,255,255,0.2); border-radius: 1rem; }
-    .corner { position: absolute; width: 25px; height: 25px; border: 4px solid #f57c00; border-radius: 4px; }
-    .tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
-    .tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
-    .bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
-    .br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
-    .line { position: absolute; width: 100%; height: 2px; background: #f57c00; top: 50%; box-shadow: 0 0 10px #f57c00; animation: scan 2s infinite; }
-    @keyframes scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
+    #reader video { object-fit: cover; width: 100%; height: 100%; border-radius: 1.5rem; }
+    .scan-line { position: absolute; width: 100%; height: 3px; background: #10b981; top: 50%; box-shadow: 0 0 15px #10b981, 0 0 30px #10b981; animation: scanMove 2s infinite ease-in-out; z-index: 50; }
+    @keyframes scanMove { 0% { top: 10%; opacity: 0; } 10% { opacity: 1; } 50% { top: 90%; } 90% { opacity: 1; } 100% { top: 10%; opacity: 0; } }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8 min-h-screen flex flex-col items-center">
 
-  <div id="auth-view" class="max-w-md mx-auto mt-10 md:mt-20">
-      <div class="glass-card p-6 md:p-8 text-center border-t-8 border-orange-500">
-          <div class="w-20 h-20 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <i class="fi fi-sr-lock text-3xl mt-1"></i>
-          </div>
-          <h2 class="text-2xl font-black text-gray-800 mb-2">STAFF LOGIN</h2>
-          <p class="text-gray-400 text-sm mb-2">กรุณากรอกรหัส PIN เพื่อเข้าใช้งาน</p>
+  <div id="loginSection" class="w-full max-w-md mx-auto my-auto animate-[fadeIn_0.5s_ease-out]">
+      <div class="glass-card p-8 md:p-10 text-center relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-rose-500"></div>
+          <a href="index.html" class="absolute top-5 right-5 text-gray-300 hover:text-rose-500 transition-colors text-2xl"><i class="fi fi-sr-cross-circle"></i></a>
           
-          <div class="flex items-center justify-center gap-1 md:gap-2 mt-6 mb-8">
-              <select id="pinPrefix" class="w-14 h-14 md:w-16 md:h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-[#f57c00] outline-none bg-gray-50 text-[#f57c00]">
-                  <option value="A">A</option>
-                  <option value="B">B</option>
+          <div class="w-20 h-20 bg-orange-50 rounded-full flex justify-center items-center text-orange-500 mx-auto mb-6 shadow-inner border border-orange-100">
+              <i class="fi fi-sr-shield-check text-4xl mt-1"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold text-gray-800 mb-2">ระบบเจ้าหน้าที่</h2>
+          <p class="text-gray-500 text-sm mb-8">CRA TCAS Fair 2026</p>
+          
+          <div class="flex justify-center items-center gap-2 mb-8">
+              <select id="pinPrefix" class="w-16 h-16 text-center text-xl font-extrabold border-2 border-gray-300 rounded-xl bg-gray-50 text-gray-700 outline-none focus:border-orange-500">
+                  <option value="A">A</option><option value="B">B</option>
               </select>
-              <span class="text-gray-400 font-bold mx-0.5">-</span>
-              <input type="text" maxlength="1" inputmode="numeric" class="pin-box w-10 h-14 md:w-11 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-[#f57c00] outline-none transition-colors">
-              <input type="text" maxlength="1" inputmode="numeric" class="pin-box w-10 h-14 md:w-11 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-[#f57c00] outline-none transition-colors">
-              <input type="text" maxlength="1" inputmode="numeric" class="pin-box w-10 h-14 md:w-11 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-[#f57c00] outline-none transition-colors">
-              <input type="text" maxlength="1" inputmode="numeric" class="pin-box w-10 h-14 md:w-11 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-[#f57c00] outline-none transition-colors">
-              <input type="text" maxlength="1" inputmode="numeric" class="pin-box w-10 h-14 md:w-11 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-[#f57c00] outline-none transition-colors">
+              <span class="text-gray-300 font-bold mx-1">-</span>
+              <div class="flex gap-2">
+                  <input type="tel" maxlength="1" class="pin-box w-12 h-16"><input type="tel" maxlength="1" class="pin-box w-12 h-16"><input type="tel" maxlength="1" class="pin-box w-12 h-16"><input type="tel" maxlength="1" class="pin-box w-12 h-16"><input type="tel" maxlength="1" class="pin-box w-12 h-16">
+              </div>
           </div>
-          
-          <button onclick="handleAuth()" id="loginBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">
-              ยืนยันรหัสผ่าน
-          </button>
-          
-          <div class="mt-6 border-t pt-4">
-              <button onclick="google.script.run.withSuccessHandler(url=>window.top.location.href=url+'?page=index').getAppUrl()" class="text-sm text-gray-400 hover:text-orange-500 flex items-center justify-center gap-2 mx-auto transition-colors">
-                  <i class="fi fi-sr-arrow-left"></i> กลับหน้าลงทะเบียน
-              </button>
-          </div>
+          <button id="btnLogin" onclick="verifyPin()" class="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">เข้าสู่ระบบ</button>
       </div>
   </div>
 
-  <div id="main-view" class="max-w-md mx-auto hidden animate-[fadeIn_0.5s_ease-out]">
-      <div class="flex justify-between items-center mb-6">
-          <div>
-              <h1 class="text-2xl font-extrabold text-gray-800">CRA Staff</h1>
-              <div class="flex items-center gap-2 text-green-600 font-bold text-xs uppercase">
-                  <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Authorized (Scanner)
+  <div id="scannerSection" class="w-full max-w-6xl mx-auto hidden animate-[fadeIn_0.5s_ease-out]">
+      
+      <div class="flex justify-between items-center mb-8 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-orange-100 rounded-xl flex justify-center items-center text-orange-500 hidden md:flex"><i class="fi fi-sr-camera text-2xl mt-1"></i></div>
+              <div>
+                  <h1 class="text-xl md:text-2xl font-extrabold text-gray-800">CRA Photobooth</h1>
+                  <p class="text-sm text-green-600 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> ระบบพร้อมใช้งาน</p>
               </div>
           </div>
-          <button onclick="logout()" class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-sm border border-gray-100 transition-colors">
-              <i class="fi fi-sr-sign-out-alt mt-1"></i>
+          <button onclick="logout()" class="flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-500 px-4 py-2.5 rounded-xl font-bold transition-colors">
+              <i class="fi fi-sr-sign-out-alt mt-0.5"></i> <span class="hidden md:inline">ออกจากระบบ</span>
           </button>
       </div>
 
-      <div class="glass-card p-4 mb-6 flex items-center justify-between bg-orange-50 border border-orange-100">
-          <span class="text-orange-700 font-bold flex items-center gap-2"><i class="fi fi-sr-calendar-day"></i> รอบรับสิทธิ์:</span>
-          <select id="daySelect" onchange="updateStats()" class="bg-white border-2 border-orange-200 text-orange-600 font-black px-4 py-2 rounded-xl outline-none shadow-sm cursor-pointer">
-              <option value="D1">DAY 1 (25 ก.พ.)</option>
-              <option value="D2">DAY 2 (26 ก.พ.)</option>
-          </select>
-      </div>
-
-      <div class="glass-card p-6 mb-6">
-          <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2"><i class="fi fi-sr-keyboard text-orange-500"></i> คีย์รหัสด้วยมือ</h3>
-          <div class="flex items-center gap-3 mb-4">
-              <div class="bg-gray-100 px-4 py-3 rounded-xl font-bold text-gray-400 text-lg">Dek</div>
-              <input type="number" id="manualInput" class="w-full p-3 bg-orange-50 border-2 border-orange-100 rounded-xl text-center text-3xl font-black text-orange-600 outline-none" placeholder="001">
-          </div>
-          <button onclick="submitManual()" class="w-full bg-[#1e293b] hover:bg-black text-white font-bold py-4 rounded-2xl active:scale-95 transition-all shadow-md text-lg">ยืนยันรหัส</button>
-      </div>
-
-      <div class="glass-card p-6 mb-6">
-          <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2"><i class="fi fi-sr-camera text-orange-500"></i> สแกนคูปอง</h3>
-          <div class="scanner-wrapper shadow-lg">
-              <div id="reader"></div>
-              <div class="scan-overlay">
-                  <div class="scan-box">
-                      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
-                      <div class="line"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7 space-y-6">
+              
+              <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div>
+                      <h3 class="font-bold text-gray-800">รอบกิจกรรม (Day)</h3>
+                      <p class="text-xs text-gray-500">เลือกวันที่ของคูปองที่ต้องการสแกน</p>
+                      <p id="dateLockMsg" class="text-xs font-bold text-rose-500 mt-1 hidden"></p>
+                  </div>
+                  <div class="flex items-center gap-4 bg-gray-50 p-2 rounded-2xl border border-gray-200">
+                      <span class="font-bold text-gray-800 px-2" id="textD1">Day 1</span>
+                      <div class="relative inline-block w-14 align-middle select-none">
+                          <input type="checkbox" id="dayToggle" onchange="updateDayMode()" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300"/>
+                          <label for="dayToggle" id="dayToggleLabel" class="toggle-label block h-7 rounded-full bg-orange-400 cursor-pointer transition-colors duration-300"></label>
+                      </div>
+                      <span class="font-bold text-gray-400 px-2" id="textD2">Day 2</span>
                   </div>
               </div>
-          </div>
-      </div>
 
-      <div class="glass-card p-6 mb-20">
-          <div class="flex justify-between items-end mb-6 pb-4 border-b border-gray-100">
-              <span class="text-gray-400 font-bold text-sm">ยอดสแกนสำเร็จวันนี้</span>
-              <span class="text-4xl font-black text-[#8bc34a]" id="statCount">0</span>
+              <div class="glass-card p-6">
+                  <h2 class="text-sm font-bold text-gray-500 mb-4 flex items-center gap-2">
+                      <i class="fi fi-sr-keyboard text-gray-400"></i> พิมพ์รหัสหากสแกนไม่ติด
+                  </h2>
+                  <form onsubmit="event.preventDefault(); submitManualCode();" class="flex gap-3">
+                      <div class="bg-gray-100 px-4 py-4 rounded-xl font-bold text-gray-500 flex items-center justify-center border border-gray-200">Dek</div>
+                      <input type="tel" id="manualCode" placeholder="001" class="w-full bg-white border-2 border-gray-200 text-center rounded-xl font-extrabold text-2xl text-orange-500 outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-50 transition-all" autocomplete="off" maxlength="3">
+                      <div id="suffixBox" class="bg-orange-500 text-white px-4 py-4 rounded-xl font-extrabold text-xl flex items-center justify-center shadow-md">D1</div>
+                      <button type="submit" class="bg-slate-800 hover:bg-black text-white px-6 rounded-xl font-bold transition-colors"><i class="fi fi-sr-paper-plane text-xl mt-1"></i></button>
+                  </form>
+              </div>
+
+              <div class="glass-card p-6">
+                  <div class="flex justify-between items-center mb-4">
+                      <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fi fi-sr-expand"></i> สแกน QR Code</h2>
+                      <span id="cameraStatusBadge" class="text-xs font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-full">กล้องปิดอยู่</span>
+                  </div>
+
+                  <button id="startCameraBtn" onclick="startScanner()" class="w-full h-[350px] bg-slate-50 hover:bg-orange-50 border-4 border-dashed border-slate-200 hover:border-orange-300 rounded-2xl flex flex-col items-center justify-center gap-4 transition-all group outline-none focus:ring-4 focus:ring-orange-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 text-slate-300 group-hover:text-orange-400 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M4 5h3a1 1 0 00.8-.4l1.6-2.13A1 1 0 0110.2 2h3.6a1 1 0 01.8.4L16.2 4.6a1 1 0 00.8.4h3a2 2 0 012 2v13a2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2zm8 13a6 6 0 100-12 6 6 0 000 12zm0-2a4 4 0 110-8 4 4 0 010 8z"></path>
+                      </svg>
+                      <div class="text-center">
+                          <p class="text-xl font-bold text-slate-600 group-hover:text-orange-500">แตะเพื่อเปิดกล้อง</p>
+                          <p class="text-sm text-slate-400 mt-1">กดเปิดเมื่อพร้อมสแกน เพื่อประหยัดแบตเตอรี่</p>
+                      </div>
+                  </button>
+
+                  <div id="scannerContainer" class="hidden relative">
+                      <div class="scanner-wrapper">
+                          <div id="reader"></div>
+                          <div class="scan-line"></div>
+                      </div>
+                      <button onclick="stopScanner()" class="mt-4 w-full bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition-colors">
+                          <i class="fi fi-sr-power"></i> ปิดกล้องพักหน้าจอ
+                      </button>
+                  </div>
+              </div>
+
           </div>
-          <div id="historyList" class="space-y-2">
-               <p class="text-center text-gray-300 text-sm py-4 border-2 border-dashed rounded-xl">ยังไม่มีคิวรอบนี้</p>
+
+          <div class="lg:col-span-5 space-y-6">
+              <div id="statsCard" class="glass-card p-6 bg-gradient-to-br from-orange-500 to-amber-600 text-white relative overflow-hidden transition-all duration-500">
+                  <i class="fi fi-sr-chart-pie-alt absolute -right-6 -bottom-6 text-9xl text-white opacity-10"></i>
+                  <div class="relative z-10">
+                      <div class="flex justify-between items-start mb-6">
+                          <div>
+                              <h2 class="text-lg font-bold text-white opacity-90">ยอดสแกนสำเร็จ</h2>
+                              <p class="text-xs text-white opacity-75 mt-1">ข้อมูลรอบ <span id="statDayBadge" class="bg-white/20 px-2 py-0.5 rounded font-bold">D1</span></p>
+                          </div>
+                          <div class="w-10 h-10 bg-white/20 rounded-full flex justify-center items-center backdrop-blur-sm">
+                              <i class="fi fi-sr-users text-xl mt-1"></i>
+                          </div>
+                      </div>
+                      <div class="text-6xl font-black tracking-tight" id="totalScanned">-</div>
+                  </div>
+              </div>
+
+              <div class="glass-card p-0 overflow-hidden flex flex-col h-[400px]">
+                  <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                      <h2 class="font-bold text-gray-800 flex items-center gap-2"><i class="fi fi-sr-time-past text-orange-500" id="listIcon"></i> ประวัติล่าสุด</h2>
+                      <button onclick="fetchStats()" class="text-xs font-bold text-gray-500 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 bg-gray-100">
+                          <i class="fi fi-sr-refresh"></i> รีเฟรช
+                      </button>
+                  </div>
+                  <div id="recentScansList" class="flex-1 overflow-y-auto p-5 space-y-3 bg-white"></div>
+              </div>
           </div>
       </div>
   </div>
 
   <script>
-    let html5QrCode;
+    // ==========================================
+    // ⚠️ ใส่ URL ของ Google Apps Script ของคุณที่นี่ ⚠️
+    // ==========================================
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz2WVLumggLAGfibD_9u-Ms3hiTKz0gaEtx9EDSKm_yXtgqmuBZ8NlefiJHp7C0ejTY/exec'; 
 
-    // การเลื่อนช่อง PIN อัตโนมัติ
-    document.addEventListener("DOMContentLoaded", function() {
-        const boxes = document.querySelectorAll('.pin-box');
-        boxes.forEach((box, i) => {
-            box.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, ''); 
-                if (this.value !== '' && i < boxes.length - 1) boxes[i + 1].focus(); 
+    async function apiCall(action, data = {}) {
+        try {
+            const res = await fetch(GAS_URL, { 
+                method: 'POST', redirect: 'follow',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: action, data: data }) 
             });
-            box.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && this.value === '' && i > 0) boxes[i - 1].focus(); 
-            });
+            return await res.json();
+        } catch(e) { throw new Error('การเชื่อมต่อกับเซิร์ฟเวอร์ล้มเหลว'); }
+    }
+
+    let html5QrCode = null;
+    let isCameraOpen = false;
+    let currentSuffix = "D1"; 
+
+    const pinBoxes = document.querySelectorAll('.pin-box');
+    pinBoxes.forEach((box, i) => {
+        box.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, ''); 
+            if (this.value && i < pinBoxes.length - 1) pinBoxes[i + 1].focus(); 
         });
-
-        // จำ Session
-        if (sessionStorage.getItem('adminAuth') === 'true') {
-            document.getElementById('auth-view').classList.add('hidden');
-            document.getElementById('main-view').classList.remove('hidden');
-            startScanner();
-            updateStats();
-        }
+        box.addEventListener('keydown', function(e) { 
+            if (e.key === 'Backspace' && !this.value && i > 0) pinBoxes[i - 1].focus(); 
+        });
     });
 
-    // 🔒 ฟังก์ชันตรวจสอบ PIN (มีดักจับ Error ป้องกันปุ่มค้างแล้ว!)
-    function handleAuth() {
-        const prefix = document.getElementById('pinPrefix').value;
-        const pinBody = Array.from(document.querySelectorAll('.pin-box')).map(b => b.value).join('');
-        const btn = document.getElementById('loginBtn');
-
-        if (pinBody.length !== 5) {
-            Swal.fire({ icon: 'warning', title: 'กรอกรหัสไม่ครบ', text: 'กรุณากรอกรหัส PIN ให้ครบ 5 หลัก', confirmButtonColor: '#f57c00' });
-            return;
+    window.onload = () => { 
+        if(sessionStorage.getItem('adminAuth') === 'true') {
+            showScannerUI(); 
+        } else if (sessionStorage.getItem('adminDataAuth') === 'true') {
+            window.location.href = 'data.html';
         }
+    };
 
-        const fullPin = prefix + pinBody;
-        
-        // หมุนปุ่ม
-        btn.innerHTML = `<i class="fi fi-sr-spinner animate-spin mr-2"></i> กำลังตรวจสอบ...`;
-        btn.disabled = true;
+    function verifyPin() {
+        const fullPin = document.getElementById('pinPrefix').value + Array.from(pinBoxes).map(b => b.value).join('');
+        if(fullPin.length !== 6) return Swal.fire({icon: 'warning', text: 'กรอกรหัส PIN ให้ครบ 6 หลัก'});
 
-        google.script.run
-            .withSuccessHandler(function(res) {
-                if (res.status === 'success') {
-                    sessionStorage.setItem('adminAuth', 'true');
-                    
-                    if (res.targetPage === 'data') {
-                        // ถ้าเป็น A
-                        Swal.fire({ title: 'เข้าสู่ระบบสำเร็จ', text: 'กำลังพาท่านไปหน้า Dashboard...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-                        google.script.run.withSuccessHandler(url => window.top.location.href = url + "?page=data").getAppUrl();
-                    } else {
-                        // ถ้าเป็น B
-                        document.getElementById('auth-view').classList.add('hidden');
-                        document.getElementById('main-view').classList.remove('hidden');
-                        startScanner();
-                        updateStats();
-                    }
+        let btn = document.getElementById('btnLogin'); btn.innerText = 'กำลังตรวจสอบ...'; btn.disabled = true;
+        apiCall('verifyAdminPin', { pin: fullPin }).then(res => {
+            btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
+            
+            if(res.status === 'success') { 
+                const prefix = document.getElementById('pinPrefix').value;
+                if (prefix === 'A') {
+                    // แอดมิน A: ไปหน้า Dashboard
+                    sessionStorage.setItem('adminDataAuth', 'true'); 
+                    window.location.href = 'data.html'; 
                 } else {
-                    // รหัสผิด (ปลดล็อกปุ่ม)
-                    Swal.fire({ icon: 'error', title: 'รหัสผิด!', text: res.message || 'รหัส PIN ไม่ถูกต้อง', confirmButtonColor: '#f57c00' });
-                    btn.innerHTML = "ยืนยันรหัสผ่าน";
-                    btn.disabled = false;
-                    document.querySelectorAll('.pin-box').forEach(b => b.value = '');
-                    document.querySelector('.pin-box').focus();
+                    // แอดมิน B: เปิดหน้ากล้องสแกน
+                    sessionStorage.setItem('adminAuth', 'true'); 
+                    showScannerUI(); 
                 }
-            })
-            // 🚨 ป้องกันปุ่มค้าง ถ้าเกิดลืม Deploy หรือ Server มีปัญหา
-            .withFailureHandler(function(err) {
-                Swal.fire({ 
-                    icon: 'error', 
-                    title: 'เชื่อมต่อขัดข้อง', 
-                    html: 'ไม่สามารถติดต่อหลังบ้านได้<br><b>อย่าลืมกด Deploy > New deployment ก่อนใช้งานจริงนะครับ!</b>', 
-                    confirmButtonColor: '#ef4444' 
-                });
-                btn.innerHTML = "ยืนยันรหัสผ่าน";
-                btn.disabled = false;
-            })
-            .verifyAdminPin(fullPin); // เรียกไปที่ Code.gs
-    }
-
-    // 📸 ฟังก์ชันกล้อง
-    function startScanner() {
-        if(html5QrCode) { try { html5QrCode.stop().then(() => html5QrCode.clear()); } catch(e) {} }
-        html5QrCode = new Html5Qrcode("reader");
-        
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { fps: 10, qrbox: { width: 250, height: 250 } }, 
-            (txt) => {
-                html5QrCode.pause();
-                if (navigator.vibrate) navigator.vibrate(200);
-                processAction(txt);
-            }, 
-            () => {}
-        ).catch(err => {
-            document.getElementById('reader').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-red-500 font-bold p-6 text-center bg-gray-900 rounded-xl"><i class="fi fi-sr-camera-slash text-4xl mb-3"></i>เปิดกล้องไม่ได้</div>`;
+            } else {
+                Swal.fire({icon: 'error', text: res.message});
+            }
+        }).catch((err) => { 
+            btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
+            Swal.fire({icon: 'error', title: 'ขัดข้อง', text: err.message});
         });
     }
 
-    function submitManual() {
-        const val = document.getElementById('manualInput').value;
-        const day = document.getElementById('daySelect').value;
-        if (!val) return;
-        const fullCode = "Dek" + ("000" + val).slice(-3) + day;
-        processAction(fullCode);
+    function showScannerUI() {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('scannerSection').classList.remove('hidden');
+        checkAdminEventDate(); 
     }
 
-    function processAction(code) {
-        Swal.fire({ title: 'กำลังตรวจสอบ...', html: 'รหัส: <b class="text-[#f57c00] font-mono text-xl">' + code + '</b>', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-        
-        const currentSuffix = document.getElementById('daySelect').value;
+    function checkAdminEventDate() {
+        const today = new Date();
+        const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+        const toggle = document.getElementById('dayToggle');
+        const toggleLabel = document.getElementById('dayToggleLabel');
+        const lockMsg = document.getElementById('dateLockMsg');
 
-        google.script.run
-            .withSuccessHandler(function(res) {
-                if (res.status === 'success') {
-                    Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: res.message, timer: 1500, showConfirmButton: false });
-                    updateStats();
-                } else {
-                    Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: res.message, confirmButtonColor: '#ef4444' });
-                }
-                if(html5QrCode) try{ html5QrCode.resume(); }catch(e){}
-                document.getElementById('manualInput').value = '';
-                document.getElementById('manualInput').focus();
-            })
-            .withFailureHandler(function(err) {
-                Swal.fire({ icon: 'error', title: 'ขัดข้อง', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', confirmButtonColor: '#ef4444' });
-                if(html5QrCode) try{ html5QrCode.resume(); }catch(e){}
-            })
-            .processCouponScan(code, currentSuffix);
+        if (y === 2026 && m === 3 && d === 25) {
+            toggle.checked = false; toggle.disabled = true;
+            toggle.classList.replace('cursor-pointer', 'cursor-not-allowed');
+            toggleLabel.classList.replace('cursor-pointer', 'cursor-not-allowed'); toggleLabel.classList.add('opacity-50');
+            lockMsg.innerText = "🔒 ล็อกสแกนเฉพาะคูปอง Day 1"; lockMsg.classList.remove('hidden');
+        } else if (y === 2026 && m === 3 && d === 26) {
+            toggle.checked = true; toggle.disabled = true;
+            toggle.classList.replace('cursor-pointer', 'cursor-not-allowed');
+            toggleLabel.classList.replace('cursor-pointer', 'cursor-not-allowed'); toggleLabel.classList.add('opacity-50');
+            lockMsg.innerText = "🔒 ล็อกสแกนเฉพาะคูปอง Day 2"; lockMsg.classList.remove('hidden');
+        }
+        updateDayMode();
     }
 
-    function updateStats() {
-        const day = document.getElementById('daySelect').value;
-        google.script.run.withSuccessHandler(function(stats) {
-            document.getElementById('statCount').innerText = stats.total || 0;
-            const list = document.getElementById('historyList');
-            if(stats.recent && stats.recent.length > 0) {
-                list.innerHTML = stats.recent.map(item => `
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-[#8bc34a]"></div>
-                            <span class="font-mono font-bold text-gray-700">${item.code}</span>
-                        </div>
-                        <span class="text-[10px] text-gray-400 font-bold">${item.time}</span>
-                    </div>`).join('');
+    function updateDayMode() {
+        currentSuffix = document.getElementById('dayToggle').checked ? "D2" : "D1";
+        const box = document.getElementById('suffixBox'), badge = document.getElementById('statDayBadge'), statsCard = document.getElementById('statsCard'), listIcon = document.getElementById('listIcon');
+        box.innerText = currentSuffix; badge.innerText = currentSuffix;
+
+        if(currentSuffix === "D2") {
+            box.className = "bg-rose-500 text-white px-4 py-4 rounded-xl font-extrabold text-xl flex items-center justify-center shadow-md transition-colors";
+            document.getElementById('textD1').classList.replace('text-gray-800', 'text-gray-400'); document.getElementById('textD2').classList.replace('text-gray-400', 'text-gray-800');
+            statsCard.className = "glass-card p-6 bg-gradient-to-br from-rose-500 to-pink-600 text-white relative overflow-hidden transition-all duration-500";
+            listIcon.className = "fi fi-sr-time-past text-rose-500";
+        } else {
+            box.className = "bg-orange-500 text-white px-4 py-4 rounded-xl font-extrabold text-xl flex items-center justify-center shadow-md transition-colors";
+            document.getElementById('textD1').classList.replace('text-gray-400', 'text-gray-800'); document.getElementById('textD2').classList.replace('text-gray-800', 'text-gray-400');
+            statsCard.className = "glass-card p-6 bg-gradient-to-br from-orange-500 to-amber-600 text-white relative overflow-hidden transition-all duration-500";
+            listIcon.className = "fi fi-sr-time-past text-orange-500";
+        }
+        document.getElementById('manualCode').value = ""; 
+        fetchStats(); 
+    }
+
+    async function startScanner() {
+        document.getElementById('startCameraBtn').classList.add('hidden'); document.getElementById('scannerContainer').classList.remove('hidden');
+        document.getElementById('cameraStatusBadge').innerText = "กำลังใช้กล้อง..."; document.getElementById('cameraStatusBadge').className = "text-xs font-bold bg-green-100 text-green-600 px-3 py-1 rounded-full animate-pulse";
+        html5QrCode = new Html5Qrcode("reader");
+        try {
+            await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+                (decodedText) => { html5QrCode.pause(); if(navigator.vibrate) navigator.vibrate(200); processCode(decodedText); },
+                (err) => {} 
+            );
+            isCameraOpen = true;
+        } catch(err) {
+            stopScanner(); Swal.fire({icon: 'error', title: 'เปิดกล้องไม่ได้', text: 'โปรดอนุญาตสิทธิ์กล้อง (Camera) ในเบราว์เซอร์'});
+        }
+    }
+
+    async function stopScanner() {
+        if(html5QrCode && isCameraOpen) { try { await html5QrCode.stop(); html5QrCode.clear(); } catch(e) {} isCameraOpen = false; }
+        document.getElementById('scannerContainer').classList.add('hidden'); document.getElementById('startCameraBtn').classList.remove('hidden');
+        document.getElementById('cameraStatusBadge').innerText = "กล้องปิดอยู่"; document.getElementById('cameraStatusBadge').className = "text-xs font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-full";
+    }
+
+    function submitManualCode() {
+        let val = document.getElementById('manualCode').value.trim();
+        if(!val) return; processCode("Dek" + ("000" + val).slice(-3) + currentSuffix);
+    }
+
+    function processCode(code) {
+        Swal.fire({ title: 'กำลังตรวจสอบ...', html: `<div class="mt-4 py-3 bg-gray-50 rounded-xl border"><b class="text-3xl tracking-widest text-orange-500 font-mono">${code}</b></div>`, allowOutsideClick: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-3xl' } });
+
+        apiCall('processCouponScan', { code: code, suffix: currentSuffix }).then(async res => {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            if(res.status === 'success') {
+                await Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: `รหัส: ${code}`, showConfirmButton: true, confirmButtonText: 'สแกนคิวต่อไป', confirmButtonColor: '#22c55e', allowOutsideClick: false, customClass: { popup: 'rounded-3xl' } });
+                if(res.stats) updateStatsUI(res.stats);
             } else {
-                list.innerHTML = `<p class="text-center text-gray-300 text-sm py-6 border-2 border-dashed rounded-xl">ยังไม่มีข้อมูลของรอบนี้</p>`;
+                await Swal.fire({ icon: 'error', title: 'ไม่ผ่าน', text: res.message, confirmButtonColor: '#f43f5e', showConfirmButton: true, confirmButtonText: 'ปิดหน้าต่าง', allowOutsideClick: false, customClass: { popup: 'rounded-3xl' } });
             }
-        }).getScanStats(day);
+            document.getElementById('manualCode').value = ""; 
+            if(html5QrCode && html5QrCode.getState() === 3) html5QrCode.resume();
+        }).catch(async () => {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await Swal.fire({ icon: 'error', title: 'ขัดข้อง', text: 'ยิง API ไม่สำเร็จ', showConfirmButton: true, customClass: { popup: 'rounded-3xl' } });
+            if(html5QrCode && html5QrCode.getState() === 3) html5QrCode.resume();
+        });
     }
 
-    function logout() {
-        sessionStorage.removeItem('adminAuth');
-        location.reload();
+    function fetchStats() {
+        document.getElementById('recentScansList').innerHTML = '<div class="flex justify-center py-4"><span class="w-6 h-6 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></span></div>';
+        apiCall('getScanStats', { suffix: currentSuffix }).then(stats => updateStatsUI(stats));
     }
+
+    function updateStatsUI(stats) {
+        const totalEl = document.getElementById('totalScanned');
+        totalEl.classList.add('scale-110', 'text-white/70'); setTimeout(() => totalEl.classList.remove('scale-110', 'text-white/70'), 300);
+        totalEl.innerText = stats.total || 0;
+
+        let list = document.getElementById('recentScansList');
+        let iconColor = currentSuffix === "D2" ? "bg-rose-50 text-rose-500" : "bg-orange-50 text-orange-500";
+        if(stats.recent && stats.recent.length > 0) {
+            list.innerHTML = stats.recent.map(i => `<div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"><div class="flex items-center gap-3"><div class="w-10 h-10 ${iconColor} rounded-full flex justify-center items-center group-hover:scale-110 transition-transform"><i class="fi fi-sr-check mt-1"></i></div><div><p class="font-mono font-bold text-gray-800 text-base">${i.code}</p><p class="text-[11px] text-gray-400 font-medium">สแกนสำเร็จ</p></div></div><span class="text-xs text-gray-400 font-bold bg-gray-50 px-2.5 py-1 rounded-lg">${i.time}</span></div>`).join('');
+        } else {
+            list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-gray-300"><i class="fi fi-sr-box-open text-4xl mb-2"></i><p class="text-sm font-medium text-gray-400">ยังไม่มีคิวสแกนในรอบนี้</p></div>`;
+        }
+    }
+
+    async function logout() { await stopScanner(); sessionStorage.removeItem('adminAuth'); window.location.reload(); }
   </script>
 </body>
 </html>
