@@ -10,22 +10,36 @@
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   
   <style>
-    body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #f0fdf4; -webkit-tap-highlight-color: transparent;}
-    .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border: 1px solid #f0fdf4; }
+    body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* Standard Input Glass for Text/Tel */
+    /* 🌟 แก้ปัญหาขอบตัด Dropdown โดนบัง 🌟 */
+    .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border: 1px solid #f0fdf4; position: relative; }
+    
+    /* Standard Input Glass */
     .input-glass { background-color: #f8fafc; border: 2px solid #e2e8f0; transition: all 0.2s ease-in-out; width: 100%; padding: 1rem 1.25rem; border-radius: 1rem; outline: none; font-weight: 700; color: #1e293b;}
     .input-glass:focus { border-color: #f57c00; box-shadow: 0 0 0 4px rgba(245, 124, 0, 0.1); background-color: #fff; }
     .input-glass::placeholder { color: #94a3b8; font-weight: 500; }
 
     /* Premium Buttons */
     .btn-orange { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; transition: all 0.3s ease; border-radius: 9999px; }
-    .btn-orange:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(245, 124, 0, 0.3); }
+    .btn-orange:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(245, 124, 0, 0.4); }
     .btn-orange:disabled { opacity: 0.7; cursor: not-allowed; }
     
     .step-section { display: none; animation: fadeIn 0.5s ease-out; }
     .step-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ==================================================== */
+    /* 🌟 ลายน้ำไอคอนลอยไปมา (Floating Background Icons) 🌟 */
+    /* ==================================================== */
+    .floating-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -40; }
+    .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(139, 195, 74, 0.15); animation: floatUp linear infinite; }
+    @keyframes floatUp {
+        0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; }
+    }
 
     /* ==================================================== */
     /* 🌟 UI: Custom Dropdown (Universal) 🌟 */
@@ -34,13 +48,11 @@
     .c-select-trigger { background: #ffffff; border: 2px solid #e2e8f0; padding: 0.875rem 1.25rem; border-radius: 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s; font-weight: 700; color: #334155; }
     .c-select-trigger:hover { border-color: #f57c00; }
     .c-select-wrapper.open .c-select-trigger { border-color: #f57c00; box-shadow: 0 0 0 4px rgba(245, 124, 0, 0.1); }
-    .c-options { position: absolute; top: calc(100% + 8px); left: 0; right: 0; border: 2px solid #e2e8f0; border-radius: 1.25rem; background: #fff; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; visibility: hidden; pointer-events: none; z-index: 50; max-height: 280px; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: translateY(-10px) scale(0.98); }
+    .c-options { position: absolute; top: calc(100% + 8px); left: 0; right: 0; border: 2px solid #e2e8f0; border-radius: 1.25rem; background: #fff; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; visibility: hidden; pointer-events: none; z-index: 999; max-height: 280px; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: translateY(-10px) scale(0.98); }
     .c-select-wrapper.open .c-options { opacity: 1; visibility: visible; pointer-events: all; transform: translateY(0) scale(1); }
     .c-option { padding: 14px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #64748b; }
     .c-option:last-child { border-bottom: none; }
     .c-option:hover { background-color: #fff8f0; color: #f57c00; padding-left: 24px; }
-    
-    /* Scrollbar for Dropdowns */
     .c-options::-webkit-scrollbar { width: 6px; }
     .c-options::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
@@ -49,9 +61,10 @@
     /* ==================================================== */
     .rating-radio { position: relative; display: inline-block; cursor: pointer; }
     .rating-radio input { display: none; }
-    .rating-box { width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; border: 2px solid #e2e8f0; border-radius: 14px; font-weight: 800; font-size: 1.25rem; color: #94a3b8; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: white; }
+    .rating-box { width: 46px; height: 46px; display: flex; justify-content: center; align-items: center; border: 2px solid #e2e8f0; border-radius: 14px; font-weight: 800; font-size: 1.25rem; color: #94a3b8; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: white; }
+    @media (min-width: 768px) { .rating-box { width: 52px; height: 52px; font-size: 1.35rem; } }
     .rating-radio:hover .rating-box { border-color: #cbd5e1; color: #64748b; }
-    .rating-radio input:checked + .rating-box { background-color: #f57c00; border-color: #f57c00; color: white; transform: scale(1.08); box-shadow: 0 8px 16px -4px rgba(245, 124, 0, 0.4); }
+    .rating-radio input:checked + .rating-box { background-color: #f57c00; border-color: #f57c00; color: white; transform: scale(1.1); box-shadow: 0 8px 16px -4px rgba(245, 124, 0, 0.4); }
 
     /* ==================================================== */
     /* 🌟 UI: Custom Checkbox (Celebrate Effect) 🌟 */
@@ -78,9 +91,12 @@
     .normal-radio input:checked ~ .n-checkmark { border-color: #f57c00; }
     .normal-radio input:checked ~ .n-checkmark:after { content: ""; position: absolute; top: 4px; left: 4px; width: 12px; height: 12px; border-radius: 50%; background: #f57c00; }
     .normal-radio.active-radio { border-color: #f57c00; background-color: #fff8f0; color: #f57c00; }
+    
+    /* Disabled state for Date Radio */
+    .normal-radio.disabled-radio { opacity: 0.4; cursor: not-allowed; background-color: #f1f5f9; }
 
     /* School Autocomplete Match */
-    #schoolDropdown { position: absolute; z-index: 50; width: 100%; background: #fff; border: 2px solid #e2e8f0; border-radius: 1.25rem; margin-top: 8px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    #schoolDropdown { position: absolute; z-index: 999; width: 100%; background: #fff; border: 2px solid #e2e8f0; border-radius: 1.25rem; margin-top: 8px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
     #schoolDropdown li { padding: 14px 20px; font-size: 0.95rem; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; transition: 0.2s; font-weight: 600; color:#475569;}
     #schoolDropdown li:hover { background-color: #fff8f0; color: #f57c00; padding-left: 24px;}
 
@@ -88,17 +104,24 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="min-h-dvh bg-gradient-to-br from-[#f0fdf4] via-[#ecfccb] to-[#d9f99d] p-4 md:p-8 flex flex-col items-center justify-center">
+<body class="bg-transparent min-h-screen relative flex flex-col items-center py-6 md:py-12 px-4 md:px-8">
+
+  <div class="fixed inset-0 bg-gradient-to-br from-[#f0fdf4] via-[#ecfccb] to-[#d9f99d] -z-50"></div>
+  <div class="floating-bg">
+      <i class="fi fi-sr-book-alt float-icon" style="left: 10%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
+      <i class="fi fi-sr-graduation-cap float-icon" style="left: 80%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
+      <i class="fi fi-sr-microscope float-icon" style="left: 30%; font-size: 3rem; animation-duration: 28s; animation-delay: 10s;"></i>
+      <i class="fi fi-sr-diploma float-icon" style="left: 65%; font-size: 4.5rem; animation-duration: 24s; animation-delay: 15s;"></i>
+      <i class="fi fi-sr-book-open-cover float-icon" style="left: 45%; font-size: 6rem; animation-duration: 30s; animation-delay: 2s;"></i>
+  </div>
 
   <div id="loadingScreen" class="fixed inset-0 bg-[#f0fdf4] z-[100] flex flex-col items-center justify-center transition-opacity duration-500 p-6">
       <div class="main-container p-10 md:p-14 text-center max-w-lg w-full animate-[fadeIn_0.5s_ease-out] relative">
-          
           <div class="mb-8 p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-full inline-block border-4 border-white shadow-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 text-[#8bc34a] animate-bounce" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
               </svg>
           </div>
-          
           <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-3 tracking-tight">กำลังจัดเตรียมข้อมูล</h2>
           <p class="text-base text-gray-500 mb-10 font-medium" id="loadingText">เชื่อมต่อระบบฐานข้อมูล...</p>
           
@@ -109,14 +132,14 @@
       </div>
   </div>
 
-  <div id="mainContent" class="w-full max-w-5xl relative z-10 opacity-0 hidden flex flex-col items-center transition-opacity duration-700 h-0 overflow-hidden">
+  <div id="mainContent" class="w-full max-w-4xl relative z-10 opacity-0 hidden flex flex-col items-center transition-opacity duration-700">
       
       <a href="index.html" class="self-start mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 font-bold bg-white px-6 py-3 rounded-xl shadow-sm border border-gray-100 transition-colors text-sm">
          <i class="fi fi-sr-arrow-small-left text-xl mt-1"></i> ย้อนกลับหน้าแรก
       </a>
 
-      <div class="main-container w-full p-6 md:p-12 relative overflow-visible">
-          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-rose-500"></div>
+      <div class="main-container w-full p-6 md:p-12 relative">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-rose-500 rounded-t-2xl"></div>
 
           <div id="formStepper" class="mb-12 relative max-w-2xl mx-auto px-4 mt-4">
               <div class="flex items-center justify-between relative z-10">
@@ -138,9 +161,9 @@
               </div>
           </div>
 
-          <form id="surveyForm" class="space-y-8">
+          <form id="surveyForm">
               
-              <div id="step1" class="step-section active space-y-8">
+              <div id="step1" class="step-section active space-y-8 pb-4">
                   <h2 class="text-2xl md:text-3xl font-black flex items-center gap-4 text-gray-800 border-b-2 border-gray-50 pb-5">
                       <div class="w-14 h-14 bg-[#f0fdf4] rounded-2xl flex items-center justify-center text-[#7cb342] border border-[#d9f99d]"><i class="fi fi-sr-user mt-1"></i></div> ข้อมูลส่วนตัว
                   </h2>
@@ -148,8 +171,8 @@
                   <div class="bg-gray-50/50 p-6 md:p-8 rounded-3xl border border-gray-100">
                       <label class="block text-base font-bold mb-4 text-gray-700">วันที่เข้าร่วมกิจกรรม <span class="text-rose-500">*</span></label>
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <label class="normal-radio"><input type="radio" name="eventDate" value="25 เมษายน 2569" onchange="updateRadioStyle(this)"><span class="n-checkmark"></span><span class="radio-text">25 เม.ย. 69 (วันที่ 1)</span></label>
-                          <label class="normal-radio"><input type="radio" name="eventDate" value="26 เมษายน 2569" onchange="updateRadioStyle(this)"><span class="n-checkmark"></span><span class="radio-text">26 เม.ย. 69 (วันที่ 2)</span></label>
+                          <label class="normal-radio" id="wrapDate25"><input type="radio" name="eventDate" value="25 เมษายน 2569" id="radioDate25" onchange="updateRadioStyle(this, 'normal-radio')"><span class="n-checkmark"></span><span class="radio-text">25 เม.ย. 69 (วันที่ 1)</span></label>
+                          <label class="normal-radio" id="wrapDate26"><input type="radio" name="eventDate" value="26 เมษายน 2569" id="radioDate26" onchange="updateRadioStyle(this, 'normal-radio')"><span class="n-checkmark"></span><span class="radio-text">26 เม.ย. 69 (วันที่ 2)</span></label>
                       </div>
                   </div>
 
@@ -161,7 +184,7 @@
                       </div>
                   </div>
 
-                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                           <label class="block text-base font-bold mb-3 text-gray-700">ประเภทผู้เข้าร่วม <span class="text-rose-500">*</span></label>
                           <input type="hidden" id="userType" value="">
@@ -172,14 +195,12 @@
                           <input type="hidden" id="gender" value="">
                           <div id="dd-gender"></div>
                       </div>
-                      
                       <div id="wrapAge">
                           <label class="block text-base font-bold mb-3 text-gray-700">ช่วงอายุ <span class="text-rose-500">*</span></label>
                           <input type="hidden" id="age" value="">
                           <div id="dd-age"></div>
                       </div>
-                      
-                      <div id="wrapParentRelation" class="hidden lg:col-span-2 bg-orange-50/50 p-6 rounded-2xl border border-orange-100 mt-2">
+                      <div id="wrapParentRelation" class="hidden md:col-span-2 bg-orange-50/50 p-6 rounded-2xl border border-orange-100 mt-2">
                           <label class="block text-base font-bold mb-3 text-orange-700">เกี่ยวข้องเป็น <span class="text-rose-500">*</span></label>
                           <input type="hidden" id="parentRelation" value="">
                           <div id="dd-parentRelation"></div>
@@ -189,7 +210,7 @@
                   <div class="flex justify-end pt-8 border-t border-gray-100"><button type="button" onclick="nextStep(1)" class="btn-orange px-12 py-4 font-black text-lg shadow-md hover:shadow-lg">หน้าถัดไป</button></div>
               </div>
 
-              <div id="step2" class="step-section space-y-8">
+              <div id="step2" class="step-section space-y-8 pb-4">
                   <h2 class="text-2xl md:text-3xl font-black flex items-center gap-4 text-gray-800 border-b-2 border-gray-50 pb-5">
                       <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 border border-orange-100"><i class="fi fi-sr-book-alt mt-1"></i></div> ข้อมูลการศึกษา
                   </h2>
@@ -229,14 +250,14 @@
                   </div>
               </div>
 
-              <div id="step3" class="step-section space-y-8">
+              <div id="step3" class="step-section space-y-8 pb-8">
                   <h2 class="text-2xl md:text-3xl font-black flex items-center gap-4 text-gray-800 border-b-2 border-gray-50 pb-5">
-                      <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 border border-red-100"><i class="fi fi-sr-heart mt-1"></i></div> แบบสอบถาม
+                      <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 border border-red-100"><i class="fi fi-sr-heart mt-1"></i></div> แบบสอบถามเพิ่มเติม
                   </h2>
                   
                   <div class="bg-gray-50/50 p-6 md:p-8 rounded-3xl border border-gray-100 space-y-8">
                       <div>
-                          <label class="block text-base font-bold mb-4 text-gray-700">รู้จัก CRA มาก่อนหรือไม่ <span class="text-rose-500">*</span></label>
+                          <label class="block text-base font-bold mb-4 text-gray-700">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่ <span class="text-rose-500">*</span></label>
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <label class="normal-radio"><input type="radio" name="knowCRA" value="ใช่ รู้จัก" onchange="updateRadioStyle(this)"><span class="n-checkmark"></span><span class="text-gray-700">ใช่ รู้จัก</span></label>
                               <label class="normal-radio"><input type="radio" name="knowCRA" value="ไม่รู้จัก" onchange="updateRadioStyle(this)"><span class="n-checkmark"></span><span class="text-gray-700">ไม่รู้จัก</span></label>
@@ -245,13 +266,13 @@
                       <div class="h-px w-full bg-gray-200"></div>
                       
                       <div>
-                          <label class="block text-base font-bold mb-4 text-gray-800">ช่องทางที่ทำให้รู้จัก <span class="text-rose-500">*</span></label>
+                          <label class="block text-base font-bold mb-4 text-gray-800">รู้จักจากช่องทางใด (ตอบได้มากกว่า 1) <span class="text-rose-500">*</span></label>
                           <div id="channelGroup" class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1"></div>
                           <input type="text" id="otherChannel" class="input-glass mt-4 hidden bg-orange-50 focus:border-orange-500" placeholder="ระบุช่องทางอื่น...">
                       </div>
                       <div class="h-px w-full bg-gray-200"></div>
                       <div>
-                          <label class="block text-base font-bold mb-4 text-gray-800">สื่อโซเชียลที่ติดตาม <span class="text-rose-500">*</span></label>
+                          <label class="block text-base font-bold mb-4 text-gray-800">สื่อที่ใช้ติดตามข่าวสาร (ตอบได้มากกว่า 1) <span class="text-rose-500">*</span></label>
                           <div id="mediaGroup" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pl-1"></div>
                           <input type="text" id="otherMedia" class="input-glass mt-4 hidden bg-orange-50 focus:border-orange-500" placeholder="ระบุสื่ออื่น...">
                       </div>
@@ -259,7 +280,7 @@
 
                   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <div class="lg:col-span-2">
-                          <label class="block text-base font-bold mb-3 text-gray-700">หลักสูตรที่สนใจ (สูงสุด 3 อันดับ)</label>
+                          <label class="block text-base font-bold mb-3 text-gray-700">หลักสูตรที่ท่านสนใจ (เลือกสูงสุด 3 อันดับ)</label>
                           <div class="space-y-4 p-6 border-2 border-gray-100 rounded-3xl bg-white shadow-sm">
                               <input type="hidden" id="interest1" value=""><div id="dd-interest1"></div>
                               <input type="hidden" id="interest2" value=""><div id="dd-interest2"></div>
@@ -267,21 +288,22 @@
                           </div>
                       </div>
 
-                      <div class="lg:col-span-2">
+                      <div class="lg:col-span-2 mt-4">
                           <label class="block text-base font-bold mb-3 text-gray-700">รอบ TCAS ที่สนใจสมัคร</label>
                           <input type="hidden" id="tcasRound" value="">
                           <div id="dd-tcasRound"></div>
                       </div>
                   </div>
 
-                  <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 p-6 md:p-8 rounded-3xl border border-orange-200">
-                      <label class="block text-base font-bold mb-4 text-gray-800">ติดตามเพจ Education CRA หรือไม่ <span class="text-rose-500">*</span></label>
+                  <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 p-6 md:p-8 rounded-3xl border border-orange-200 mt-6">
+                      <label class="block text-base font-bold mb-4 text-gray-800">ท่านได้ติดตามประกาศและข่าวสารต่าง ๆ ในเพจ Education CRA หรือไม่ <span class="text-rose-500">*</span></label>
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <label class="normal-radio bg-white"><input type="radio" name="followPage" value="ใช่ติดตาม" onchange="updateRadioStyle(this); togglePlatform(true);"><span class="n-checkmark"></span><span class="text-gray-700">ใช่ ติดตาม</span></label>
                           <label class="normal-radio bg-white"><input type="radio" name="followPage" value="ไม่ได้ติดตาม" onchange="updateRadioStyle(this); togglePlatform(false);"><span class="n-checkmark"></span><span class="text-gray-700">ไม่ได้ติดตาม</span></label>
                       </div>
+                      
                       <div id="wrapFollowPlatform" class="hidden mt-6 pt-6 border-t border-orange-200/60">
-                          <label class="block text-base font-bold mb-3 text-orange-800">แพลตฟอร์มที่ติดตาม</label>
+                          <label class="block text-base font-bold mb-3 text-orange-800">ส่วนใหญ่ติดตามเพจเพื่อดูข่าวสารในแพลตฟอร์มใดมากที่สุด <span class="text-rose-500">*</span></label>
                           <input type="hidden" id="followPlatform" value="">
                           <div id="dd-followPlatform"></div>
                       </div>
@@ -289,14 +311,15 @@
 
                   <div class="pt-8">
                       <h3 class="text-xl md:text-2xl font-black text-green-700 mb-6 bg-green-50 p-5 rounded-2xl border-2 border-green-100 flex items-center gap-3 shadow-sm">
-                          <i class="fi fi-sr-star mt-1 text-orange-500"></i> ให้คะแนนความพึงพอใจ <span class="text-rose-500">*</span>
+                          <i class="fi fi-sr-star mt-1 text-orange-500"></i> ให้คะแนน (1=น้อย, 5=มากที่สุด) <span class="text-rose-500">*</span>
                       </h3>
                       <div class="space-y-4" id="ratingContainer"></div>
                   </div>
                   
-                  <div class="pt-4">
-                      <label class="block text-base font-bold mb-3 text-gray-700">ข้อเสนอแนะเพิ่มเติม <span class="text-rose-500">*</span></label>
-                      <textarea id="suggestion" rows="4" class="input-glass resize-none leading-relaxed text-gray-700" placeholder="อยากให้ทีมงานจัดกิจกรรมแบบไหนเพิ่มเติม..."></textarea>
+                  <div class="pt-6">
+                      <label class="block text-base font-bold mb-2 text-gray-700">ข้อเสนอแนะเพิ่มเติม <span class="text-rose-500">*</span></label>
+                      <p class="text-sm text-gray-500 font-medium mb-4 leading-relaxed">บอกเราหน่อยว่า "อยากให้ทีมงานจัดกิจกรรมแบบไหนเพิ่มเติม หรือมีอะไรอยากจะบอกหรือให้กำลังใจทีมงาน"</p>
+                      <textarea id="suggestion" rows="4" class="input-glass resize-none leading-relaxed text-gray-700" placeholder="พิมพ์ข้อความของคุณที่นี่..."></textarea>
                   </div>
 
                   <div class="flex justify-between items-center pt-10 border-t border-gray-200 mt-8">
@@ -370,8 +393,34 @@
         document.getElementById('loadPerc').innerText = perc + '%';
     }
 
+    // 🌟 ฟังก์ชันเช็ควันที่เพื่อบล็อกปุ่มอัตโนมัติ 🌟
+    function checkEventDate() {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = today.getMonth(); // เดือนเริ่มจาก 0 (เมษายน = 3)
+        const d = today.getDate();
+
+        const radio25 = document.getElementById('radioDate25');
+        const wrap25 = document.getElementById('wrapDate25');
+        const radio26 = document.getElementById('radioDate26');
+        const wrap26 = document.getElementById('wrapDate26');
+
+        if (y === 2026 && m === 3 && d === 25) {
+            // วันที่ 25 กดได้แค่วันที่ 25
+            radio26.disabled = true;
+            wrap26.classList.add('disabled-radio');
+            wrap26.querySelector('.radio-text').innerText = "26 เม.ย. (ยังไม่เปิด)";
+        } else if (y === 2026 && m === 3 && d === 26) {
+            // วันที่ 26 กดได้แค่วันที่ 26
+            radio25.disabled = true;
+            wrap25.classList.add('disabled-radio');
+            wrap25.querySelector('.radio-text').innerText = "25 เม.ย. (ปิดแล้ว)";
+        }
+    }
+
     window.onload = function() {
-        // 🌟 Loading 1-100% Logic 🌟
+        checkEventDate(); // เช็ควันที่ตอนโหลดหน้า
+
         loadingInterval = setInterval(() => {
             if (currentPerc < 90) {
                 currentPerc += Math.random() * 4;
@@ -405,18 +454,18 @@
         document.getElementById('channelGroup').innerHTML = buildCheck(channels, 'chkChannel', 'otherChannel');
         document.getElementById('mediaGroup').innerHTML = buildCheck(medias, 'chkMedia', 'otherMedia');
 
-        // 🌟 Custom Image Rating 1-5 Render 🌟
+        // 🌟 Custom Image Rating 1-5 Render (รายละเอียดกลับมาครบ) 🌟
         const qs = [ 
-            { id: "desireScore", text: "1. อยากเข้าศึกษาต่อราชวิทยาลัยจุฬาภรณ์ระดับใด" }, 
-            { id: "mediaSatisfactionScore", text: "2. ความพึงพอใจสื่อแนะแนวภายในกิจกรรม" },
-            { id: "prSatisfactionScore", text: "3. ความพึงพอใจ PR เพจ Education CRA" },
-            { id: "openHouseScore", text: "4. สนใจร่วมงาน CRA Open House 2026 หรือไม่" }, 
-            { id: "satisfactionScore", text: "5. ความพึงพอใจภาพรวมของกิจกรรมวันนี้" }
+            { id: "desireScore", text: "1. หลังจากเข้าร่วมกิจกรรมแล้วท่านรู้สึกอยากเข้าศึกษาต่อในราชวิทยาลัยจุฬาภรณ์ในระดับใด" }, 
+            { id: "mediaSatisfactionScore", text: "2. ความพึงพอใจสื่อที่ใช้ประกอบการแนะแนวภายในกิจกรรม" },
+            { id: "prSatisfactionScore", text: "3. ความพึงพอใจการประชาสัมพันธ์ข่าวสารเพจ Education CRA ในแพลตฟอร์มต่าง ๆ" },
+            { id: "openHouseScore", text: "4. ราชวิทยาลัยจุฬาภรณ์จะจัดกิจกรรมแนะแนวการศึกษา CRA Open House 2026 ในเดือนตุลาคม 2568 ท่านสนใจเข้าร่วมหรือไม่" }, 
+            { id: "satisfactionScore", text: "5. ความพึงพอใจภาพรวมของกิจกรรมราชวิทยาลัยจุฬาภรณ์แนะแนวการศึกษา Dek's-D TCAS Fair 2026" }
         ];
         document.getElementById('ratingContainer').innerHTML = qs.map(q => `
-            <div class="bg-white p-5 md:p-6 rounded-2xl border-2 border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 hover:border-green-200 transition-colors">
-                <span class="text-base font-bold text-gray-700 leading-relaxed md:max-w-md">${q.text}</span>
-                <div class="flex gap-2 justify-end">
+            <div class="bg-white p-5 md:p-6 rounded-2xl border-2 border-gray-100 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-5 hover:border-green-200 transition-colors">
+                <span class="text-base font-bold text-gray-700 leading-relaxed xl:max-w-xl">${q.text}</span>
+                <div class="flex gap-2 justify-start xl:justify-end">
                     ${[1,2,3,4,5].map(n=>`<label class="rating-radio"><input type="radio" name="${q.id}" value="${n}"><div class="rating-box">${n}</div></label>`).join('')}
                 </div>
             </div>`).join('');
@@ -431,7 +480,6 @@
         renderCustomDropdown('tcasRound', ['รอบ 1 Portfolio', 'รอบ 2 Quota', 'รอบ 3 Admission', 'รอบ 4 Direct Admission'], '-- เลือกรอบ --', 'fi-sr-bullseye-pointer');
         renderCustomDropdown('followPlatform', ['Facebook', 'Instagram', 'TikTok', 'X (Twitter)'], '-- เลือกแพลตฟอร์ม --', 'fi-sr-mobile-notch');
         
-        // Render Course Dropdowns with Icons
         renderCustomDropdown('interest1', coursesMap, '-- อันดับที่ 1 --', 'fi-sr-apps', refreshCourseOptions);
         renderCustomDropdown('interest2', coursesMap, '-- อันดับที่ 2 --', 'fi-sr-apps', refreshCourseOptions);
         renderCustomDropdown('interest3', coursesMap, '-- อันดับที่ 3 --', 'fi-sr-apps', refreshCourseOptions);
@@ -449,7 +497,7 @@
             <div class="c-select-wrapper" id="wrap-${inputId}">
                 <div class="c-select-trigger shadow-sm">
                     <span class="flex items-center gap-3 truncate" id="text-${inputId}">
-                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0"><i class="fi ${defaultIcon} mt-1 text-sm"></i></div>
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0"><i class="fi ${defaultIcon} mt-1 text-base"></i></div>
                         ${placeholder}
                     </span>
                     <i class="fi fi-sr-angle-small-down text-gray-400 shrink-0 ml-2"></i>
@@ -463,7 +511,7 @@
             let icon = typeof opt === 'string' ? defaultIcon : (opt.icon || defaultIcon);
             html += `
                 <div class="c-option" data-value="${val}" data-icon="${icon}">
-                    <div class="w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center text-[#f57c00] shrink-0"><i class="fi ${icon} mt-1 text-sm"></i></div>
+                    <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-[#f57c00] shrink-0"><i class="fi ${icon} mt-1 text-base"></i></div>
                     <span class="truncate">${val}</span>
                 </div>`;
         });
@@ -474,12 +522,11 @@
         const trigger = container.querySelector('.c-select-trigger');
         const textDisplay = container.querySelector(`#text-${inputId}`);
 
-        // Maintain selection if options are re-rendered
         if(hiddenInput.value) {
             let selectedOpt = Array.from(wrapper.querySelectorAll('.c-option')).find(o => o.getAttribute('data-value') === hiddenInput.value);
             if(selectedOpt) {
                 let icon = selectedOpt.getAttribute('data-icon');
-                textDisplay.innerHTML = `<div class="w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center text-[#f57c00] shrink-0"><i class="fi ${icon} mt-1 text-sm"></i></div> ${hiddenInput.value}`;
+                textDisplay.innerHTML = `<div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-[#f57c00] shrink-0"><i class="fi ${icon} mt-1 text-base"></i></div> ${hiddenInput.value}`;
             }
         }
 
@@ -496,8 +543,8 @@
                 let icon = opt.getAttribute('data-icon') || defaultIcon;
                 hiddenInput.value = val;
                 
-                if(val) textDisplay.innerHTML = `<div class="w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center text-[#f57c00] shrink-0"><i class="fi ${icon} mt-1 text-sm"></i></div> ${val}`;
-                else textDisplay.innerHTML = `<div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0"><i class="fi ${defaultIcon} mt-1 text-sm"></i></div> ${placeholder}`;
+                if(val) textDisplay.innerHTML = `<div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-[#f57c00] shrink-0"><i class="fi ${icon} mt-1 text-base"></i></div> ${val}`;
+                else textDisplay.innerHTML = `<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0"><i class="fi ${defaultIcon} mt-1 text-base"></i></div> ${placeholder}`;
                 
                 wrapper.classList.remove('open');
                 if(onChangeCallback) onChangeCallback(val);
@@ -507,7 +554,6 @@
 
     document.addEventListener('click', () => document.querySelectorAll('.c-select-wrapper').forEach(w => w.classList.remove('open')));
 
-    // Logic for hiding selected courses
     function refreshCourseOptions() {
         let selected = [document.getElementById('interest1').value, document.getElementById('interest2').value, document.getElementById('interest3').value].filter(v=>v);
         ['interest1', 'interest2', 'interest3'].forEach(id => {
@@ -519,8 +565,6 @@
             });
         });
     }
-
-    // ====================================================
 
     function updateRadioStyle(el) {
         document.querySelectorAll(`input[name="${el.name}"]`).forEach(r => r.parentElement.classList.remove('active-radio'));
@@ -551,14 +595,14 @@
         document.getElementById('schoolInputSearch').value = ""; document.getElementById('uniSchool').value = "";
         document.getElementById('provinceSelect').value = ""; document.getElementById('age').value = "";
         document.getElementById('parentRelation').value = ""; document.getElementById('education').value = "";
-        checkOther({value:""}, 'otherEducation'); // Hide other input
+        checkOther({value:""}, 'otherEducation');
 
         let eduOpts = [], ageOpts = ['ต่ำกว่า 15 ปี', '16 - 18 ปี', '18 - 23 ปี', 'มากกว่า 23 ปี'];
         
         if (type === "นักเรียน") {
             eduOpts = ["มัธยมศึกษาตอนต้น", "มัธยมศึกษาปีที่ 4 หรือเทียบเท่า", "มัธยมศึกษาปีที่ 5 หรือเทียบเท่า", "มัธยมศึกษาปีที่ 6 หรือเทียบเท่า", "อื่นๆ"];
             sec.classList.remove('hidden'); wSch.classList.remove('hidden'); wPv.classList.remove('hidden');
-            document.getElementById('schoolLabel').innerText = 'โรงเรียนของท่าน *';
+            document.getElementById('schoolLabel').innerHTML = 'โรงเรียนของท่าน <span class="text-rose-500">*</span>';
         } else if (type === "นักศึกษามหาวิทยาลัย") {
             eduOpts = ["ปริญญาตรี", "มากกว่าปริญญาตรี", "อื่นๆ"];
             sec.classList.remove('hidden'); wUni.classList.remove('hidden'); wPv.classList.remove('hidden');
@@ -566,7 +610,7 @@
             wrapAge.classList.add('hidden'); 
             eduOpts = ["ปริญญาตรี", "มากกว่าปริญญาตรี", "อื่นๆ"];
             sec.classList.remove('hidden'); wSch.classList.remove('hidden');
-            document.getElementById('schoolLabel').innerText = 'สถาบันที่ท่านสอน *';
+            document.getElementById('schoolLabel').innerHTML = 'สถาบันที่ท่านสอน <span class="text-rose-500">*</span>';
         } else if (type === "ผู้ปกครอง") {
             wrapAge.classList.add('hidden'); wrapParent.classList.remove('hidden'); 
             eduOpts = ["มัธยมศึกษาตอนปลาย", "ปริญญาตรี", "มากกว่าปริญญาตรี", "อื่นๆ"];
@@ -574,10 +618,8 @@
             eduOpts = ["มัธยมศึกษาตอนปลาย", "ปริญญาตรี", "มากกว่าปริญญาตรี", "อื่นๆ"];
         }
 
-        // Re-render dependent dropdowns
         renderCustomDropdown('education', eduOpts, '-- เลือกระดับ --', 'fi-sr-graduation-cap', (v) => checkOther({value:v}, 'otherEducation'));
         renderCustomDropdown('age', ageOpts, '-- เลือกช่วงอายุ --', 'fi-sr-calendar');
-        // Reset province visually
         renderCustomDropdown('provinceSelect', provinces, '-- เลือกจังหวัด --', 'fi-sr-map-marker');
     }
 
@@ -589,11 +631,11 @@
         if (results.length > 0) {
             results.forEach(r => {
                 var li = document.createElement('li');
-                li.innerHTML = `<span class="font-bold text-gray-800">${r[0]}</span> <span class="text-xs text-gray-400 font-medium">จ.${r[1]}</span>`;
+                li.innerHTML = `<span class="font-bold text-gray-800">${r[0]}</span> <span class="text-xs text-gray-400 ml-auto">จ.${r[1]}</span>`;
                 li.onclick = () => {
                     document.getElementById('schoolInputSearch').value = r[0];
                     document.getElementById('provinceSelect').value = r[1];
-                    renderCustomDropdown('provinceSelect', provinces, '-- เลือกจังหวัด --', 'fi-sr-map-marker'); // Update UI
+                    renderCustomDropdown('provinceSelect', provinces, '-- เลือกจังหวัด --', 'fi-sr-map-marker'); 
                     box.style.display = 'none';
                 };
                 box.appendChild(li);
