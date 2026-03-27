@@ -60,12 +60,15 @@
             <p class="text-gray-500 font-medium">Dashboard วิเคราะห์ข้อมูลผู้เข้าร่วมกิจกรรม</p>
         </div>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap justify-center gap-2">
         <button onclick="openFilterModal()" class="flex items-center gap-2 px-5 py-3 bg-white border-2 border-cra-primary text-cra-primary rounded-xl font-bold hover:bg-orange-50 transition shadow-sm">
           <i class="fi fi-sr-filter"></i> ตัวกรอง <span id="filterCountBadge" class="bg-cra-primary text-white text-xs px-2 py-0.5 rounded-full ml-1">ทั้งหมด</span>
         </button>
         <button onclick="window.print()" class="flex items-center gap-2 px-5 py-3 bg-cra-primary text-white rounded-xl font-bold hover:bg-orange-600 transition shadow-md">
           <i class="fi fi-sr-print"></i> พิมพ์รายงาน
+        </button>
+        <button onclick="logoutAdminA()" class="flex items-center gap-2 px-5 py-3 bg-rose-50 text-rose-500 rounded-xl font-bold hover:bg-rose-100 transition shadow-sm">
+          <i class="fi fi-sr-sign-out-alt"></i> ออกจากระบบ
         </button>
       </div>
     </header>
@@ -86,7 +89,7 @@
       <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-3">
         <i class="fi fi-sr-star text-yellow-500 text-2xl"></i> ภาพรวมความพึงพอใจและแนวโน้ม (เต็ม 5)
       </h3>
-      <div id="satisfactionContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <div id="satisfactionContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
     </div>
 
     <div id="pieCardContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"></div>
@@ -150,10 +153,16 @@
     Chart.register(ChartDataLabels);
     
     let RAW_DATA = [];
-    let filterDate = "All"; // All, Day 1, Day 2
-    let filterType = "All"; // All, นักเรียน, ครู, ฯลฯ
+    let filterDate = "All"; 
+    let filterType = "All"; 
 
     window.onload = async () => {
+      // 🌟 ระบบป้องกันคนเข้าตรงๆ (ถ้าไม่ได้ล็อกอินจากหน้า logadmin.html)
+      if(sessionStorage.getItem('adminDataAuth') !== 'true') {
+          window.location.href = 'logadmin.html';
+          return;
+      }
+
       try {
         const res = await fetch(GAS_URL, {
             method: 'POST', redirect: 'follow',
@@ -179,6 +188,11 @@
       }
     };
 
+    function logoutAdminA() {
+        sessionStorage.removeItem('adminDataAuth');
+        window.location.href = 'logadmin.html';
+    }
+
     function preciseRound(number, decimals = 1) {
       const multiplier = Math.pow(10, decimals);
       return Math.round(number * multiplier) / multiplier;
@@ -197,7 +211,6 @@
 
       const total = data.length;
       
-      // Update Texts
       let titleTxt = "ข้อมูลผู้ตอบแบบสอบถามทั้งหมด";
       if(filterDate !== "All" || filterType !== "All") {
           titleTxt = `ข้อมูลกรองตาม: <span class="text-cra-primary">${filterDate}</span> | <span class="text-cra-primary">${filterType}</span>`;
@@ -234,7 +247,7 @@
     }
 
     function renderSatisfaction(data) {
-      // Col: 16 (อยากเรียนต่อ), 17 (Open House), 24 (สื่อในงาน), 23 (PR เพจ), 18 (ภาพรวมงาน)
+      // 16=ศึกษาต่อ, 17=Open House, 24=สื่อในงาน, 23=PRเพจ, 18=ภาพรวม
       const m = [
         {c:16, l:'อยากเข้าศึกษาต่อ', ic:'fi-sr-graduation-cap'}, 
         {c:17, l:'สนใจร่วม Open House', ic:'fi-sr-building'}, 
@@ -262,6 +275,7 @@
 
     function renderPieSections(data, total) {
       const container = document.getElementById('pieCardContainer'); container.innerHTML = '';
+      // Col: 2=Gender, 1=Type, 9=Know CRA
       const items = [
         { id: 'G', col: 2, title: 'เพศ', ic: 'fi-sr-venus-mars' }, 
         { id: 'T', col: 1, title: 'ประเภทผู้เข้าร่วม', ic: 'fi-sr-users' }, 
@@ -370,7 +384,7 @@
 
       const list = [...new Set(data.map(r => r[19]))].filter(v => v && v.toString().trim() !== "-" && v.toString().length > 2);
       document.getElementById('mBody').innerHTML = list.length ? `<ul class="space-y-3">${list.map(v => `<li class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-start gap-3 text-sm text-slate-700 font-medium"><i class="fi fi-sr-quote-right text-blue-400 mt-0.5"></i> <span class="leading-relaxed">${v}</span></li>`).join('')}</ul>` : '<p class="text-center text-gray-400 py-10 font-bold">ไม่มีข้อเสนอแนะในเงื่อนไขนี้</p>';
-      document.getElementById('mFooter').innerHTML = ''; // Clear footer
+      document.getElementById('mFooter').innerHTML = ''; 
       document.getElementById('modalBase').classList.remove('hidden');
     }
 
