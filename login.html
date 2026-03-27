@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ดูคูปอง - DEK-D TCAS FAIR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent;}
+    .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 2rem; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15); }
+    .loader { width: 22px; height: 22px; border: 3px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
+    @keyframes rotation { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#aedd50] via-[#8bc34a] to-[#689f38] min-h-screen p-4 flex flex-col items-center justify-center">
+  <div class="w-full max-w-md relative z-10 flex justify-center">
+      <div id="view-login" class="w-full animate-[fadeIn_0.5s_ease-out]">
+          <div class="glass-panel p-8 text-center">
+              <div class="w-20 h-20 bg-orange-50 rounded-full flex justify-center items-center text-orange-500 mx-auto mb-4 border border-orange-100"><i class="fi fi-sr-ticket text-4xl mt-1"></i></div>
+              <h2 class="text-3xl font-extrabold text-gray-800 mb-2">ดูคูปอง</h2>
+              <p class="text-gray-500 mb-8 text-sm">กรอกเบอร์โทรที่ใช้ลงทะเบียน</p>
+              <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
+                  <div class="relative">
+                      <i class="fi fi-sr-phone-call absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                      <input type="tel" id="loginPhone" class="w-full pl-14 pr-4 py-4 rounded-2xl border bg-gray-50 focus:bg-white focus:border-orange-500 outline-none font-bold text-xl tracking-widest text-center" placeholder="08X-XXX-XXXX" required oninput="formatPhone(this)" maxlength="12">
+                  </div>
+                  <button type="submit" id="btnLogin" class="w-full bg-orange-500 text-white p-4 rounded-2xl font-bold text-lg shadow-md hover:bg-orange-600 transition flex justify-center items-center gap-2"><i class="fi fi-sr-search"></i> ค้นหา</button>
+              </form>
+              <a href="index.html" class="mt-6 block text-sm text-gray-400 hover:text-orange-500 font-medium">กลับหน้าหลัก</a>
+          </div>
+      </div>
+
+      <div id="view-coupons" class="w-full hidden animate-[fadeIn_0.5s_ease-out]">
+          <div class="glass-panel p-6 flex flex-col relative min-h-[70vh]">
+              <a href="index.html" class="absolute top-4 right-4 bg-gray-100 w-10 h-10 rounded-full flex justify-center items-center text-gray-500 hover:bg-red-50 hover:text-red-500 transition"><i class="fi fi-sr-cross-small text-xl mt-1"></i></a>
+              <div class="mb-6 mt-4 text-center">
+                  <h2 class="text-xl font-bold text-gray-800" id="userNameType"></h2>
+                  <p class="text-green-600 font-bold flex items-center justify-center gap-2 text-sm"><i class="fi fi-sr-phone-call"></i> <span id="userPhoneDisplay"></span></p>
+              </div>
+              <div class="text-center mb-4"><h3 class="font-bold text-gray-800">คูปองของคุณ</h3><p class="text-[10px] text-gray-500">แตะที่คูปองเพื่อแสดง QR Code</p></div>
+              <div id="couponList" class="flex flex-col items-center space-y-4 pb-4 overflow-y-auto"></div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // ใส่ URL ของ Google Apps Script ของคุณที่นี่
+    // ==========================================
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLPHtsitN.../exec'; 
+
+    async function apiCall(action, data = {}) {
+        try {
+            const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, data: data }) });
+            return await res.json();
+        } catch(e) { throw new Error('Network Error'); }
+    }
+
+    function formatPhone(inp) {
+        let v = inp.value.replace(/\D/g, '').substring(0, 10);
+        inp.value = v.length > 6 ? `${v.substring(0,3)}-${v.substring(3,6)}-${v.substring(6)}` : v.length > 3 ? `${v.substring(0,3)}-${v.substring(3)}` : v;
+    }
+
+    function showQR(codeStr, dateStr, isDay1) {
+        let color = isDay1 ? "#f57c00" : "#2e7d32";
+        Swal.fire({
+            title: 'ยื่นให้สตาฟฟ์',
+            html: `<p class="text-xs text-gray-500 mb-3">${dateStr}</p><div class="bg-white p-3 rounded-2xl border inline-block mb-3 shadow-sm"><img src="https://quickchart.io/qr?text=${encodeURIComponent(codeStr)}&size=200" class="w-48 h-48"></div><div class="font-mono text-2xl font-bold py-2 rounded-lg" style="color:${color}; background:${color}15;">${codeStr}</div>`,
+            confirmButtonText: 'ปิด', confirmButtonColor: color, customClass: { popup: 'rounded-3xl' }
+        });
+    }
+
+    function handleLogin() {
+        let btn = document.getElementById('btnLogin'), phone = document.getElementById('loginPhone').value;
+        if(phone.length !== 12) return Swal.fire({icon: 'warning', text: 'เบอร์ไม่ครบ 10 หลัก'});
+        
+        btn.innerHTML = '<span class="loader mr-2"></span> รอสักครู่...'; btn.disabled = true;
+
+        apiCall('doLogin', { phone: phone }).then(res => {
+            btn.innerHTML = '<i class="fi fi-sr-search"></i> ค้นหา'; btn.disabled = false;
+            if(res.status === 'success') {
+                document.getElementById('userNameType').innerText = "สถานะ: " + res.userData.type;
+                document.getElementById('userPhoneDisplay').innerText = res.userData.phone;
+                document.getElementById('couponList').innerHTML = res.userData.coupons.map(c => {
+                    let isD1 = c.date.includes('25') || c.code.includes('D1');
+                    let bg = isD1 ? "bg-orange-50 border-orange-200" : "bg-green-50 border-green-200";
+                    let txt = isD1 ? "text-orange-500" : "text-green-600";
+                    return `<div onclick="showQR('${c.code}', '${c.date}', ${isD1})" class="w-full max-w-[280px] p-4 rounded-2xl border-2 ${bg} cursor-pointer active:scale-95 transition flex justify-between items-center shadow-sm"><div class="flex items-center gap-3"><i class="fi fi-sr-ticket text-3xl ${txt} opacity-80"></i><div class="text-left"><p class="font-bold text-gray-800 leading-tight">คูปองถ่ายรูป</p><p class="text-[10px] text-gray-500">${isD1 ? 'วันที่ 1' : 'วันที่ 2'}</p></div></div><i class="fi fi-sr-qr-scan text-xl text-gray-400"></i></div>`;
+                }).join('');
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-coupons').classList.remove('hidden');
+            } else Swal.fire({icon: 'error', text: res.message});
+        }).catch(() => {
+            btn.innerHTML = '<i class="fi fi-sr-search"></i> ค้นหา'; btn.disabled = false;
+            Swal.fire({icon: 'error', text: 'ขัดข้อง'});
+        });
+    }
+  </script>
+</body>
+</html>
