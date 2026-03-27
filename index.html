@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dek's-D TCAS Fair 2026 - CRA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js" type="module"></script>
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent;}
+    .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); border-radius: 2.5rem; }
+    .btn-orange { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; transition: all 0.3s; }
+    .btn-orange:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(245, 124, 0, 0.4); }
+  </style>
+</head>
+<body class="min-h-dvh relative selection:bg-green-200 flex flex-col items-center justify-center p-4">
+  <div class="fixed inset-0 bg-gradient-to-br from-[#aedd50] via-[#8bc34a] to-[#689f38] -z-50"></div>
+  
+  <div class="w-full max-w-4xl relative z-10 animate-[fadeIn_0.5s_ease-out]">
+      <div class="glass-panel relative p-8 md:p-12 text-center flex flex-col items-center gap-6">
+         <a href="logadmin.html" class="absolute top-6 right-6 text-gray-300 hover:text-[#f57c00] transition-colors duration-300 cursor-pointer p-2 rounded-full hover:bg-orange-50" title="สำหรับเจ้าหน้าที่">
+            <i class="fi fi-sr-settings text-xl"></i>
+         </a>
+
+         <div class="mb-4">
+             <div class="inline-flex items-center justify-center px-6 py-2 bg-[#e53935] text-white rounded-full shadow-lg mb-4 font-bold transform -rotate-3 text-lg">เข้าฟรี!</div>
+             <h2 class="text-lg md:text-xl text-[#7cb342] font-bold uppercase mb-1">กิจกรรมราชวิทยาลัยจุฬาภรณ์แนะแนวการศึกษา</h2>
+             <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 mb-2 tracking-tight">Dek's-D TCAS Fair <span class="text-[#f57c00]">2026</span></h1>
+             <p class="text-gray-600 mt-4 max-w-lg mx-auto px-4 py-3 bg-[#f1f8e9] rounded-xl border border-[#c5e1a5]">
+                 🎉 ทำแบบประเมินความพึงพอใจ รับสิทธิ์ <span class="font-bold text-[#f57c00]">คูปองถ่ายรูปบูธ ฟรี!</span><br>
+                 <span class="text-xs text-gray-400 font-medium">(จำกัด 1 สิทธิ์ / 1 วัน / 1 เบอร์โทรศัพท์)</span>
+             </p>
+         </div>
+         
+         <div class="relative w-full max-w-[280px] h-40 md:max-w-[400px] md:h-[250px] mx-auto">
+             <dotlottie-wc src="https://lottie.host/ef534813-19b0-4679-903d-4790b0d4ee40/JkiBf0lw92.lottie" autoplay loop class="w-full h-full"></dotlottie-wc>
+         </div>
+         
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg mt-2">
+             <a href="register.html" class="btn-orange rounded-2xl p-5 shadow-md w-full text-left border-0 cursor-pointer group flex items-center gap-3">
+                 <i class="fi fi-sr-document-signed text-3xl group-hover:scale-110 transition-transform"></i>
+                 <div>
+                     <span class="block text-[11px] uppercase font-bold opacity-90">สำหรับผู้เข้าร่วมกิจกรรม</span>
+                     <span class="block text-lg font-bold">แบบสอบถามรับคูปอง</span>
+                 </div>
+             </a>
+             
+             <a href="login.html" class="bg-white border-2 border-orange-100 text-[#f57c00] rounded-2xl p-5 hover:bg-orange-50 transition w-full text-left cursor-pointer group shadow-sm flex items-center gap-3">
+                 <i class="fi fi-sr-ticket text-3xl group-hover:scale-110 transition-transform"></i>
+                 <div>
+                     <span class="block text-[11px] uppercase font-bold text-gray-400">เผลอปิดหน้าจอ?</span>
+                     <span class="block text-lg font-bold">เข้าสู่ระบบ / ดูคูปอง</span>
+                 </div>
+             </a>
+         </div>
+      </div>
+  </div>
+</body>
+</html>
